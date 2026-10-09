@@ -1,0 +1,697 @@
+/* =========================================================
+   CONECTING CORRIDORS - ETAPA 1
+   Cores: azul, preto e branco (as cores da logo)
+   ========================================================= */
+
+:root {
+  --azul: #0a55db;
+  --azul-escuro: #062a8f;
+  --azul-claro: #e8f0fd;
+  --preto: #0e1116;
+  --texto-suave: #4a5568;
+  --linha: #d9e2f0;
+  --branco: #ffffff;
+  --erro: #b42318;
+  --sucesso: #0b6b3a;
+
+  --fonte-titulo: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --fonte-texto: "Barlow", "Segoe UI", Arial, sans-serif;
+}
+
+/* ---------- Base ---------- */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fonte-texto);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--preto);
+  background: var(--branco);
+}
+
+/* Garante que o atributo "hidden" sempre esconde o elemento */
+[hidden] {
+  display: none !important;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  line-height: 1.05;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--azul);
+}
+
+:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 3px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.container-estreito {
+  max-width: 640px;
+}
+
+/* ---------- Botões ---------- */
+
+.botao {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  font-family: var(--fonte-texto);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  color: var(--branco);
+  background: var(--azul);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.botao:hover {
+  background: var(--azul-escuro);
+}
+
+.botao:active {
+  transform: translateY(1px);
+}
+
+.link-simples {
+  font-weight: 600;
+  color: var(--preto);
+  text-underline-offset: 4px;
+}
+
+.link-simples:hover {
+  color: var(--azul);
+}
+
+/* ---------- Formulários ---------- */
+
+.formulario {
+  display: grid;
+  gap: 1rem;
+}
+
+.campo {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.campo label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  font-family: var(--fonte-texto);
+  font-size: 1rem;
+  color: var(--preto);
+  background: var(--branco);
+  border: 1.5px solid var(--linha);
+  border-radius: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.campo textarea {
+  resize: vertical;
+}
+
+.campo input:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(10, 85, 219, 0.25);
+}
+
+.mensagem {
+  min-height: 1.4em;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--erro);
+}
+
+.mensagem.ok {
+  color: var(--sucesso);
+}
+
+/* ---------- Tela de login ---------- */
+
+.tela-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+  background: linear-gradient(180deg, var(--azul-claro) 0%, var(--branco) 55%);
+}
+
+.login-caixa {
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem 1.5rem;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: 18px;
+  text-align: center;
+}
+
+.login-logo {
+  display: block;
+  margin: 0 auto 0.5rem;
+}
+
+.login-titulo {
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+.login-texto {
+  margin: 0.25rem 0 1.5rem;
+  color: var(--texto-suave);
+}
+
+.login-caixa .formulario {
+  text-align: left;
+}
+
+.abas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  margin-bottom: 1.25rem;
+  background: var(--azul-claro);
+  border-radius: 12px;
+}
+
+.aba {
+  padding: 0.6rem 0.5rem;
+  font-family: var(--fonte-texto);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.aba[aria-selected="true"] {
+  color: var(--branco);
+  background: var(--azul);
+}
+
+/* ---------- Topo e menu ---------- */
+
+.topo {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--branco);
+  border-bottom: 1px solid var(--linha);
+}
+
+.topo-conteudo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0.6rem 1.25rem;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--fonte-titulo);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--preto);
+  text-decoration: none;
+}
+
+.botao-sair {
+  padding: 0.4rem 0.9rem;
+  font-family: var(--fonte-texto);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--preto);
+  background: transparent;
+  border: 1.5px solid var(--linha);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.botao-sair:hover {
+  color: var(--azul);
+  border-color: var(--azul);
+}
+
+/* No celular o menu fica numa linha própria, que rola para o lado se precisar */
+.menu {
+  display: flex;
+  gap: 1.25rem;
+  width: 100%;
+  order: 3;
+  overflow-x: auto;
+  padding: 0.25rem 0;
+}
+
+.menu a {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--preto);
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.menu a:hover {
+  color: var(--azul);
+  border-bottom-color: var(--azul);
+}
+
+/* ---------- Seções ---------- */
+
+.secao {
+  padding: 3.5rem 0;
+  /* Evita que o topo fixo cubra o título quando se clica numa âncora */
+  scroll-margin-top: 6.5rem;
+}
+
+.secao-clara {
+  background: var(--azul-claro);
+}
+
+.titulo-secao {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 700;
+}
+
+.texto-secao {
+  max-width: 60ch;
+  margin: 0.5rem 0 2rem;
+  color: var(--texto-suave);
+}
+
+/* ---------- Início: logo flutuando com LED ---------- */
+
+.heroi {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1rem 0 3rem;
+}
+
+/* No celular a logo vem primeiro */
+.logo-palco {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(70vw, 300px);
+  margin: 0 auto;
+}
+
+/* O LED: um brilho azul suave que "respira" atrás da logo */
+.logo-palco::before {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(10, 85, 219, 0.55) 0%,
+    rgba(10, 85, 219, 0.2) 45%,
+    rgba(10, 85, 219, 0) 70%
+  );
+  filter: blur(22px);
+  animation: led 4s ease-in-out infinite alternate;
+}
+
+.logo-palco img {
+  position: relative;
+  width: 100%;
+  animation: flutuar 5s ease-in-out infinite alternate;
+}
+
+@keyframes flutuar {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes led {
+  from {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+.heroi-titulo {
+  font-size: clamp(2.8rem, 9vw, 4.6rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.heroi-lead {
+  max-width: 34ch;
+  margin: 1rem 0 1.75rem;
+  font-size: 1.25rem;
+  color: var(--texto-suave);
+}
+
+.heroi-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+}
+
+/* ---------- Início: para que serve ---------- */
+
+.sobre {
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--linha);
+}
+
+.sobre-lista {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sobre-lista li {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--linha);
+}
+
+.sobre-lista li:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.sobre-lista h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--azul-escuro);
+}
+
+.sobre-lista p {
+  max-width: 60ch;
+  color: var(--texto-suave);
+}
+
+/* ---------- Equipes ---------- */
+
+.equipes-grade {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.equipe-tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  overflow: hidden;
+  font-family: var(--fonte-texto);
+  text-align: left;
+  color: var(--branco);
+  background: linear-gradient(135deg, var(--azul-escuro), var(--azul));
+  border: 3px solid var(--branco);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.equipe-tile:hover {
+  transform: translateY(-3px);
+}
+
+.equipe-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Faixa escura embaixo para o nome ficar legível sobre qualquer foto */
+.equipe-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 17, 22, 0) 45%, rgba(14, 17, 22, 0.8) 100%);
+}
+
+.equipe-nome {
+  position: absolute;
+  left: 1.25rem;
+  right: 1.25rem;
+  bottom: 1rem;
+  z-index: 1;
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.9rem, 5vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+/* O selo só aparece na equipe escolhida */
+.equipe-selo {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  z-index: 1;
+  display: none;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--branco);
+  background: var(--azul);
+  border-radius: 999px;
+}
+
+.equipe-tile.selecionada {
+  box-shadow: 0 0 0 4px var(--azul);
+}
+
+.equipe-tile.selecionada .equipe-selo {
+  display: block;
+}
+
+.aviso-equipe {
+  min-height: 1.6em;
+  margin-top: 1.25rem;
+  font-weight: 600;
+  color: var(--azul-escuro);
+}
+
+/* ---------- Comunidade ---------- */
+
+.comunidade-grade {
+  display: grid;
+  gap: 2rem;
+}
+
+.caixa-midia {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 2px dashed var(--linha);
+  border-radius: 14px;
+}
+
+.caixa-midia h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.caixa-midia p {
+  margin-top: 0.25rem;
+  color: var(--texto-suave);
+}
+
+.lista-comentarios {
+  display: grid;
+}
+
+.comentario {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+.comentario:first-child {
+  padding-top: 0;
+}
+
+.comentario-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+
+.comentario-nome {
+  font-weight: 600;
+}
+
+.comentario-data {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.comentario-texto {
+  margin-top: 0.25rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* O comentário recém-publicado aparece com uma entrada suave */
+.comentario.novo {
+  animation: entrar 0.4s ease;
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vazio {
+  color: var(--texto-suave);
+}
+
+/* ---------- Rodapé ---------- */
+
+.rodape {
+  padding: 2rem 0;
+  font-size: 0.95rem;
+  color: var(--texto-suave);
+  border-top: 1px solid var(--linha);
+}
+
+/* ---------- Telas maiores ---------- */
+
+@media (min-width: 760px) {
+  .topo-conteudo {
+    flex-wrap: nowrap;
+  }
+
+  .menu {
+    width: auto;
+    order: 1;
+    margin-left: auto;
+    overflow: visible;
+  }
+
+  .botao-sair {
+    order: 2;
+  }
+
+  .secao {
+    padding: 5rem 0;
+    scroll-margin-top: 4.5rem;
+  }
+
+  .heroi {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 3rem;
+    padding: 2rem 0 4rem;
+  }
+
+  /* No computador o texto fica à esquerda e a logo à direita */
+  .logo-palco {
+    order: 2;
+    width: min(100%, 440px);
+  }
+
+  .heroi-texto {
+    order: 1;
+  }
+
+  .sobre-lista li {
+    grid-template-columns: 240px 1fr;
+    gap: 2rem;
+  }
+
+  .equipes-grade {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem;
+  }
+
+  .comunidade-grade {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+/* Quem prefere menos movimento no celular/computador não vê a animação */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .logo-palco::before,
+  .logo-palco img,
+  .comentario.novo {
+    animation: none;
+  }
+
+  .equipe-tile,
+  .botao {
+    transition: none;
+  }
+}

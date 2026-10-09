@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0A55DB">
+  <title>Conecting Corridors</title>
+  <link rel="icon" href="img/logo.png" type="image/png">
+
+  <!-- Fontes (só visual). Se ficarem sem internet, o navegador usa uma fonte parecida. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- =========================================================
+       TELA 1: LOGIN / CADASTRO
+       ========================================================= -->
+  <main id="tela-login" class="tela-login">
+    <div class="login-caixa">
+      <img class="login-logo" src="img/logo.png" alt="Logo do Conecting Corridors" width="120" height="120">
+      <h1 class="login-titulo">Conecting Corridors</h1>
+      <p class="login-texto">Entre para acompanhar os treinos da sua equipe.</p>
+
+      <div class="abas" role="tablist" aria-label="Entrar ou criar conta">
+        <button type="button" id="aba-entrar" class="aba" role="tab" aria-selected="true" aria-controls="form-entrar">Entrar</button>
+        <button type="button" id="aba-criar" class="aba" role="tab" aria-selected="false" aria-controls="form-criar">Criar conta</button>
+      </div>
+
+      <!-- Formulário: entrar -->
+      <form id="form-entrar" class="formulario" novalidate>
+        <div class="campo">
+          <label for="entrar-email">Email</label>
+          <input id="entrar-email" type="email" autocomplete="email" required>
+        </div>
+        <div class="campo">
+          <label for="entrar-senha">Senha</label>
+          <input id="entrar-senha" type="password" autocomplete="current-password" required>
+        </div>
+        <p id="msg-entrar" class="mensagem" role="alert"></p>
+        <button type="submit" class="botao">Entrar</button>
+      </form>
+
+      <!-- Formulário: criar conta -->
+      <form id="form-criar" class="formulario" hidden novalidate>
+        <div class="campo">
+          <label for="criar-nome">Nome de usuário</label>
+          <input id="criar-nome" type="text" autocomplete="username" maxlength="20" required>
+        </div>
+        <div class="campo">
+          <label for="criar-email">Email</label>
+          <input id="criar-email" type="email" autocomplete="email" required>
+        </div>
+        <div class="campo">
+          <label for="criar-senha">Senha (mínimo de 6 caracteres)</label>
+          <input id="criar-senha" type="password" autocomplete="new-password" required>
+        </div>
+        <p id="msg-criar" class="mensagem" role="alert"></p>
+        <button type="submit" class="botao">Criar conta</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       TELA 2: O SITE (aparece depois do login)
+       ========================================================= -->
+  <div id="tela-site" hidden>
+
+    <header class="topo">
+      <div class="topo-conteudo">
+        <a class="marca" href="#inicio">
+          <img src="img/logo.png" alt="" width="36" height="36">
+          <span>Conecting Corridors</span>
+        </a>
+        <button type="button" id="botao-sair" class="botao-sair">Sair</button>
+        <nav class="menu" aria-label="Seções do site">
+          <a href="#inicio">Início</a>
+          <a href="#equipes">Equipes</a>
+          <a href="#comunidade">Comunidade</a>
+          <a href="#sugestoes">Sugestões</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- INÍCIO -->
+      <section id="inicio" class="secao">
+        <div class="container">
+          <div class="heroi">
+            <div class="logo-palco">
+              <img src="img/logo.png" alt="Corredor dentro de um círculo com quatro integrantes de equipe" width="460" height="460">
+            </div>
+
+            <div class="heroi-texto">
+              <h1 class="heroi-titulo">Bem-vindo, <span id="nome-usuario"></span>.</h1>
+              <p class="heroi-lead">Aqui as equipes de corrida da região combinam os treinos e conversam num só lugar.</p>
+              <div class="heroi-botoes">
+                <a class="botao" href="#equipes">Escolher minha equipe</a>
+                <a class="link-simples" href="#comunidade">Ver a comunidade</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="sobre">
+            <h2 class="titulo-secao">Para que serve o site</h2>
+            <ul class="sobre-lista">
+              <li>
+                <h3>Treinos combinados</h3>
+                <p>O líder de cada equipe publica o dia, o horário e o local de saída. Você confirma presença e ninguém precisa perguntar no grupo.</p>
+              </li>
+              <li>
+                <h3>Integrantes à vista</h3>
+                <p>Veja quem faz parte da sua equipe e quem vai a cada treino.</p>
+              </li>
+              <li>
+                <h3>Dúvidas respondidas</h3>
+                <p>Pergunte e responda. Quem já passou pela mesma dúvida ajuda quem está chegando.</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- EQUIPES -->
+      <section id="equipes" class="secao secao-clara">
+        <div class="container">
+          <h2 class="titulo-secao">Escolha sua equipe</h2>
+          <p class="texto-secao">Toque na foto da sua equipe para entrar na página dela.</p>
+
+          <div class="equipes-grade">
+            <!-- Coloque as fotos em img/equipe-vai-na-fe.jpg e img/equipe-comedores-de-km.jpg -->
+            <button type="button" class="equipe-tile" data-equipe="Equipe vai na fé" aria-pressed="false">
+              <img src="img/equipe-vai-na-fe.jpg" alt="Foto da Equipe vai na fé">
+              <span class="equipe-selo">Sua equipe</span>
+              <span class="equipe-nome">Equipe vai na fé</span>
+            </button>
+
+            <button type="button" class="equipe-tile" data-equipe="Equipe comedores de km" aria-pressed="false">
+              <img src="img/equipe-comedores-de-km.jpg" alt="Foto da Equipe comedores de km">
+              <span class="equipe-selo">Sua equipe</span>
+              <span class="equipe-nome">Equipe comedores de km</span>
+            </button>
+          </div>
+
+          <p id="aviso-equipe" class="aviso-equipe" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <!-- COMUNIDADE -->
+      <section id="comunidade" class="secao">
+        <div class="container">
+          <h2 class="titulo-secao">Comunidade</h2>
+          <p class="texto-secao">Converse com quem corre na região e compartilhe os treinos e as provas.</p>
+
+          <div class="comunidade-grade">
+            <div>
+              <form id="form-comentario" class="formulario" novalidate>
+                <div class="campo">
+                  <label for="comentario-texto">Seu comentário</label>
+                  <textarea id="comentario-texto" rows="4" maxlength="500" required></textarea>
+                </div>
+                <button type="submit" class="botao">Publicar comentário</button>
+              </form>
+
+              <div class="caixa-midia">
+                <h3>Fotos e vídeos</h3>
+                <p>O envio de fotos e vídeos chega na próxima etapa do site.</p>
+              </div>
+            </div>
+
+            <div>
+              <div id="lista-comentarios" class="lista-comentarios"></div>
+              <p id="sem-comentarios" class="vazio">Ainda não há comentários. Escreva o primeiro.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUGESTÕES -->
+      <section id="sugestoes" class="secao secao-clara">
+        <div class="container container-estreito">
+          <h2 class="titulo-secao">O que podemos melhorar?</h2>
+          <p class="texto-secao">Conte o que está faltando ou o que pode ficar melhor no site.</p>
+
+          <form id="form-sugestao" class="formulario" novalidate>
+            <div class="campo">
+              <label for="sugestao-texto">Sua sugestão</label>
+              <textarea id="sugestao-texto" rows="5" maxlength="800" required></textarea>
+            </div>
+            <p id="msg-sugestao" class="mensagem" role="status"></p>
+            <button type="submit" class="botao">Enviar sugestão</button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="rodape">
+      <div class="container">
+        <p>Conecting Corridors. Equipes de corrida da região, organizadas.</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
