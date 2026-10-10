@@ -1,19 +1,3 @@
-// ---------- Conexão com o Supabase ----------
-const configurado =
-  typeof SUPABASE_URL === "string" &&
-  typeof SUPABASE_ANON_KEY === "string" &&
-  !SUPABASE_URL.includes("COLE_AQUI") &&
-  !SUPABASE_ANON_KEY.includes("COLE_AQUI")
-
-let cliente = null
-if (configurado && window.supabase) {
-  cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-}
-
-// Dados do usuário logado: { id, nome, equipe, papel }
-let perfil = null
-
-
 // ---------- Elementos da página ----------
 const telaLogin = document.getElementById("tela-login")
 const telaSite = document.getElementById("tela-site")
@@ -39,62 +23,6 @@ const semComentarios = document.getElementById("sem-comentarios")
 const formSugestao = document.getElementById("form-sugestao")
 const sugestaoTexto = document.getElementById("sugestao-texto")
 const msgSugestao = document.getElementById("msg-sugestao")
-
-
-// ---------- Funções de apoio ----------
-
-// Traduz os erros do Supabase para mensagens fáceis de entender
-function mensagemDeErro(erro) {
-  const texto = erro && erro.message ? erro.message : ""
-
-  if (texto.includes("Invalid login credentials")) {
-    return "Email ou senha incorretos."
-  }
-  if (texto.includes("Email not confirmed")) {
-    return "Confirme seu email antes de entrar. Procure a mensagem na sua caixa de entrada."
-  }
-  if (texto.includes("already registered")) {
-    return "Já existe uma conta com esse email. Use a aba Entrar."
-  }
-  if (texto.includes("Database error saving new user")) {
-    return "Esse nome de usuário já está em uso. Escolha outro."
-  }
-  if (texto.includes("Password should be")) {
-    return "A senha precisa ter pelo menos 6 caracteres."
-  }
-  if (texto.includes("rate limit")) {
-    return "Muitas tentativas. Espere alguns minutos e tente de novo."
-  }
-  return "Algo deu errado. Confira sua internet e tente de novo."
-}
-
-// Deixa o botão "ocupado" enquanto espera o Supabase responder
-function ocupado(botao, estaOcupado, textoNormal) {
-  botao.disabled = estaOcupado
-  botao.textContent = estaOcupado ? "Aguarde..." : textoNormal
-}
-
-function formatarData(valor) {
-  return new Date(valor).toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  })
-}
-
-async function carregarPerfil(idUsuario) {
-  const resposta = await cliente
-    .from("profiles")
-    .select("id, nome, equipe, papel")
-    .eq("id", idUsuario)
-    .single()
-
-  if (resposta.error) {
-    return null
-  }
-  return resposta.data
-}
 
 
 // ---------- Mostrar a tela certa ----------
@@ -275,8 +203,7 @@ function marcarEquipe(equipeEscolhida) {
   })
 
   if (equipeEscolhida) {
-    avisoEquipe.textContent =
-      "Você escolheu a " + equipeEscolhida + ". A página da equipe, com treinos e integrantes, chega na próxima etapa."
+    avisoEquipe.textContent = "Você faz parte da " + equipeEscolhida + "."
   } else {
     avisoEquipe.textContent = ""
   }
@@ -288,19 +215,23 @@ equipeTiles.forEach(function (tile) {
       return
     }
 
-    const novaEquipe = tile.dataset.equipe
-    const resposta = await cliente
-      .from("profiles")
-      .update({ equipe: novaEquipe })
-      .eq("id", perfil.id)
+    // Quem ainda não tem equipe entra na equipe que clicou.
+    // Quem já tem equipe só abre a página (para trocar, usa o botão
+    // "Passar para esta equipe" dentro da página da equipe).
+    if (perfil.equipe === "" && perfil.papel === "integrante") {
+      const resposta = await cliente
+        .from("profiles")
+        .update({ equipe: tile.dataset.equipe })
+        .eq("id", perfil.id)
 
-    if (resposta.error) {
-      avisoEquipe.textContent = "Não foi possível salvar sua equipe. Tente de novo."
-      return
+      if (resposta.error) {
+        avisoEquipe.textContent = "Não foi possível salvar sua equipe. Tente de novo."
+        return
+      }
+      perfil.equipe = tile.dataset.equipe
     }
 
-    perfil.equipe = novaEquipe
-    marcarEquipe(novaEquipe)
+    window.location.href = "equipe.html?equipe=" + tile.dataset.slug
   })
 })
 
