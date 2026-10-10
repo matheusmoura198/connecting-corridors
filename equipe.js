@@ -72,7 +72,7 @@ function souLider() {
 }
 
 
-// ---------- confere o login e monta a página ----------
+// ---------- Começo: confere o login e monta a página ----------
 async function iniciar() {
   perfil = await obterPerfilLogado()
 
@@ -94,6 +94,7 @@ async function iniciar() {
   montarAreaDoLider()
   await mostrarTreinos()
   iniciarMural(equipe.nome)
+  iniciarDuvidas(equipe.nome)
   await mostrarIntegrantes()
 }
 
@@ -123,7 +124,7 @@ function montarTopo() {
     equipeSituacao.textContent = "Você ainda não escolheu uma equipe."
   }
 
-  // Só quem é integrante pode trocar de equipe sozinho
+  // Só quem é "integrante" pode trocar de equipe sozinho
   botaoEntrarEquipe.hidden = souMembro() || perfil.papel !== "integrante"
 
   if (!souMembro() && perfil.papel === "admin") {
@@ -416,7 +417,7 @@ async function mostrarIntegrantes() {
 }
 
 
-// ---------- Botão de sair ----------
+// ---------- Sair ----------
 botaoSair.addEventListener("click", async function () {
   await cliente.auth.signOut()
   window.location.href = "index.html"
