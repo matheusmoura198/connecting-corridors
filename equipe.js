@@ -1,15 +1,7 @@
-// =========================================================
-// PÁGINA DA EQUIPE (equipe.html)
-//
-// Mostra os treinos da equipe, deixa os integrantes confirmarem
-// presença e deixa o líder marcar, editar e apagar treinos.
-// Depende do comum.js (precisa vir antes no HTML).
-// =========================================================
-
-
 // ---------- Qual equipe é esta página? ----------
 const parametros = new URLSearchParams(window.location.search)
-const equipe = equipePorSlug(parametros.get("equipe"))
+// A equipe é descoberta em iniciar(), depois que a lista de equipes carrega
+let equipe = null
 
 
 // ---------- Elementos da página ----------
@@ -99,6 +91,10 @@ async function iniciar() {
     window.location.href = "index.html"
     return
   }
+
+  await carregarEquipes()
+  equipe = equipePorSlug(parametros.get("equipe"))
+
   if (!equipe) {
     window.location.href = "index.html#equipes"
     return
@@ -114,14 +110,18 @@ async function iniciar() {
 
 // ---------- Capa da equipe ----------
 function montarTopo() {
-  document.title = equipe.nome + " | Conecting Corridors"
+  document.title = equipe.nome + " | Runners Conecting"
   equipeTitulo.textContent = equipe.nome
 
   // Se a foto ainda não existir, fica só o fundo azul com o nome
   equipeFoto.addEventListener("error", function () {
     equipeFoto.hidden = true
   })
-  equipeFoto.src = "img/equipe-" + equipe.slug + ".jpg"
+  if (equipe.foto) {
+    equipeFoto.src = equipe.foto
+  } else {
+    equipeFoto.hidden = true
+  }
 
   if (souMembro() && perfil.papel === "lider") {
     equipeSituacao.textContent = "Você é líder desta equipe."
