@@ -1,3 +1,8 @@
+/* =========================================================
+   CONECTING CORRIDORS - ETAPA 1
+   Cores: azul, preto e branco (as cores da logo)
+   ========================================================= */
+
 :root {
   --azul: #0a55db;
   --azul-escuro: #062a8f;
@@ -364,16 +369,15 @@ a {
 .logo-palco img {
   position: relative;
   width: 100%;
-  animation: flutuar 3s ease-in-out infinite alternate;
+  animation: flutuar 5s ease-in-out infinite alternate;
 }
 
 @keyframes flutuar {
-  0%, 100% {
+  from {
     transform: translateY(0);
   }
-
-  50% {
-    transform: translateY(-15px);
+  to {
+    transform: translateY(-14px);
   }
 }
 
@@ -447,11 +451,11 @@ a {
 
 /* ---------- Equipes ---------- */
 
+/* As equipes se encaixam sozinhas: 3 lado a lado no computador, 1 por linha no celular */
 .equipes-grade {
   display: grid;
-  grid-template-columns: repeat(3, mimax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1.25rem;
-  width: 100%;
 }
 
 .equipe-tile {
@@ -498,7 +502,7 @@ a {
   bottom: 1rem;
   z-index: 1;
   font-family: var(--fonte-titulo);
-  font-size: clamp(1.9rem, 5vw, 2.4rem);
+  font-size: clamp(1.7rem, 4vw, 2.1rem);
   font-weight: 800;
   line-height: 1.05;
 }
@@ -680,11 +684,6 @@ a {
   .sobre-lista li {
     grid-template-columns: 240px 1fr;
     gap: 2rem;
-  }
-
-  .equipes-grade {
-    grid-template-columns: 1fr 1fr;
-    gap: 1.75rem;
   }
 
   .comunidade-grade {
