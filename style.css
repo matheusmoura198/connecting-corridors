@@ -451,6 +451,7 @@ a {
   display: grid;
   grid-template-columns: repeat(3, mimax(0, 1fr));
   gap: 1.25rem;
+  width: 100%;
 }
 
 .equipe-tile {
