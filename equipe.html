@@ -7,7 +7,7 @@
   <title>Equipe | Runners Conecting</title>
   <link rel="icon" href="img/logo.png" type="image/png">
 
-  <!-- Fontes.Se ficarem sem internet, o navegador usa uma fonte parecida. -->
+  <!-- Fontes (só visual). Se ficarem sem internet, o navegador usa uma fonte parecida. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
@@ -15,6 +15,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <noscript>
+    <p class="aviso-noscript">Este site precisa do JavaScript ativado para funcionar.</p>
+  </noscript>
 
   <!-- A página só aparece depois que o script confirma que você está logado -->
   <div id="pagina" hidden>
@@ -31,6 +35,7 @@
           <a href="index.html#equipes">Equipes</a>
           <a href="#treinos">Treinos</a>
           <a href="#mural">Mural</a>
+          <a href="#duvidas">Dúvidas</a>
           <a href="#integrantes">Integrantes</a>
         </nav>
       </div>
@@ -38,7 +43,7 @@
 
     <main>
 
-      <!-- Equipes -->
+      <!-- CAPA DA EQUIPE -->
       <section class="equipe-topo">
         <div class="container">
           <div class="equipe-capa">
@@ -52,13 +57,13 @@
         </div>
       </section>
 
-      <!-- Treinos -->
+      <!-- TREINOS -->
       <section id="treinos" class="secao">
         <div class="container">
           <h2 class="titulo-secao">Treinos</h2>
           <p id="texto-treinos" class="texto-secao">Os próximos treinos da equipe, definidos pelo líder.</p>
 
-          <!-- Só o líder(nomeado pelo admin) da equipe (e o admin) vê esta parte -->
+          <!-- Só o líder da equipe (e o admin) vê esta parte -->
           <details id="area-lider" class="area-lider" hidden>
             <summary id="resumo-treino">Marcar novo treino</summary>
 
@@ -105,7 +110,7 @@
         </div>
       </section>
 
-      <!-- Mural -->
+      <!-- MURAL -->
       <section id="mural" class="secao secao-clara">
         <div class="container">
           <h2 class="titulo-secao">Mural</h2>
@@ -141,8 +146,42 @@
         </div>
       </section>
 
-      <!-- Integrantes -->
-      <section id="integrantes" class="secao">
+      <!-- DÚVIDAS -->
+      <section id="duvidas" class="secao">
+        <div class="container">
+          <h2 class="titulo-secao">Dúvidas</h2>
+          <p class="texto-secao">Tire dúvidas com a equipe: horário, ritmo, equipamento e provas.</p>
+
+          <div class="duvidas">
+            <p id="aviso-duvidas" class="aviso-equipe" hidden>Só integrantes desta equipe perguntam e respondem aqui. Você pode ler as dúvidas.</p>
+
+            <form id="form-duvida" class="formulario form-duvida" novalidate>
+              <div class="campo">
+                <label for="duvida-titulo">Qual é a sua dúvida?</label>
+                <input id="duvida-titulo" type="text" maxlength="120">
+              </div>
+              <div class="campo">
+                <label for="duvida-detalhe">Detalhes (opcional)</label>
+                <textarea id="duvida-detalhe" rows="3" maxlength="500"></textarea>
+              </div>
+              <p id="msg-duvida" class="mensagem" role="alert"></p>
+              <button type="submit" id="botao-perguntar" class="botao">Perguntar</button>
+            </form>
+
+            <div class="abas abas-duvidas" role="tablist" aria-label="Filtrar dúvidas">
+              <button type="button" id="filtro-abertas" class="aba" role="tab" aria-selected="true">Em aberto</button>
+              <button type="button" id="filtro-resolvidas" class="aba" role="tab" aria-selected="false">Resolvidas</button>
+            </div>
+
+            <div id="lista-duvidas" class="lista-duvidas"></div>
+            <p id="sem-duvidas" class="vazio">Nenhuma dúvida em aberto. Faça a primeira pergunta.</p>
+            <button type="button" id="botao-mais-duvidas" class="botao-sair" hidden>Ver dúvidas mais antigas</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- INTEGRANTES -->
+      <section id="integrantes" class="secao secao-clara">
         <div class="container">
           <h2 class="titulo-secao">Integrantes</h2>
           <p id="total-integrantes" class="texto-secao"></p>
@@ -154,17 +193,18 @@
 
     <footer class="rodape">
       <div class="container">
-        <p>Runners Conecting. Equipes de corrida da região, organizadas.</p>
+        <p>Runners Conecting. Equipes de corrida da região, organizadas. <a href="privacidade.html">Termos e privacidade</a></p>
       </div>
     </footer>
 
   </div>
 
-  <!-- Biblioteca do Supabase -->
+  <!-- Biblioteca do Supabase (única biblioteca externa do site) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script src="comum.js"></script>
   <script src="mural.js"></script>
+  <script src="duvidas.js"></script>
   <script src="equipe.js"></script>
 </body>
 </html>
