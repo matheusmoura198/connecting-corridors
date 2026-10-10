@@ -1,10 +1,3 @@
-// =========================================================
-// CÓDIGO COMPARTILHADO
-// Usado pelas duas páginas do site: index.html e equipe.html.
-// Este arquivo precisa vir ANTES do script.js e do equipe.js.
-// =========================================================
-
-
 // ---------- Conexão com o Supabase ----------
 const configurado =
   typeof SUPABASE_URL === "string" &&
@@ -22,10 +15,6 @@ let perfil = null
 
 
 // ---------- As equipes ----------
-// As equipes ficam na tabela "equipes" do Supabase (slug, nome e foto).
-// Para criar uma equipe nova, basta adicionar uma linha lá.
-// O "slug" é o nome curto que vai no endereço da página
-// (equipe.html?equipe=vai-na-fe).
 let EQUIPES = []
 
 async function carregarEquipes() {
@@ -45,8 +34,7 @@ function equipePorSlug(slug) {
 
 
 // ---------- Funções de apoio ----------
-
-// Traduz os erros do Supabase para mensagens fáceis de entender
+// Isso vai traduzir os erros do Supabase para mensagens fáceis de entender
 function mensagemDeErro(erro) {
   const texto = erro && erro.message ? erro.message : ""
 
@@ -113,7 +101,6 @@ async function obterPerfilLogado() {
   return await carregarPerfil(sessao.user.id)
 }
 
-// Cria um elemento HTML já com classe e texto (o texto entra como texto, nunca como HTML)
 function criarElemento(tag, classe, texto) {
   const elemento = document.createElement(tag)
   if (classe) {
