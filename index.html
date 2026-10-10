@@ -142,28 +142,34 @@
       <section id="comunidade" class="secao">
         <div class="container">
           <h2 class="titulo-secao">Comunidade</h2>
-          <p class="texto-secao">Converse com quem corre na região e compartilhe os treinos e as provas.</p>
+          <p class="texto-secao">Converse com quem corre na região e compartilhe fotos dos treinos e das provas.</p>
 
-          <div class="comunidade-grade">
-            <div>
-              <form id="form-comentario" class="formulario" novalidate>
-                <div class="campo">
-                  <label for="comentario-texto">Seu comentário</label>
-                  <textarea id="comentario-texto" rows="4" maxlength="500" required></textarea>
-                </div>
-                <button type="submit" class="botao">Publicar comentário</button>
-              </form>
+          <div class="mural">
+            <p id="aviso-mural" class="aviso-equipe" hidden>Só integrantes desta equipe publicam no mural. Você pode ver as postagens e curtir.</p>
 
-              <div class="caixa-midia">
-                <h3>Fotos</h3>
-                <p>O envio de fotos chega na próxima etapa do site.</p>
+            <form id="form-post" class="formulario form-post" novalidate>
+              <div class="campo">
+                <label for="post-texto">Escreva uma mensagem</label>
+                <textarea id="post-texto" rows="3" maxlength="500"></textarea>
               </div>
-            </div>
 
-            <div>
-              <div id="lista-comentarios" class="lista-comentarios"></div>
-              <p id="sem-comentarios" class="vazio">Ainda não há comentários. Escreva o primeiro.</p>
-            </div>
+              <div class="post-foto-linha">
+                <input id="post-foto" class="campo-arquivo" type="file" accept="image/*">
+                <label for="post-foto" class="botao-arquivo">Adicionar foto</label>
+
+                <div id="previa-foto" class="previa-foto" hidden>
+                  <img id="previa-imagem" alt="Prévia da foto escolhida">
+                  <button type="button" id="botao-remover-foto" class="botao-texto botao-texto-perigo">Remover foto</button>
+                </div>
+              </div>
+
+              <p id="msg-post" class="mensagem" role="alert"></p>
+              <button type="submit" id="botao-publicar" class="botao">Publicar</button>
+            </form>
+
+            <div id="lista-posts" class="lista-posts"></div>
+            <p id="sem-posts" class="vazio">Ainda não há postagens. Seja a primeira pessoa a publicar.</p>
+            <button type="button" id="botao-mais-posts" class="botao-sair" hidden>Ver postagens mais antigas</button>
           </div>
         </div>
       </section>
@@ -199,6 +205,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script src="comum.js"></script>
+  <script src="mural.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
