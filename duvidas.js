@@ -23,6 +23,7 @@ const botaoMaisDuvidas = document.getElementById("botao-mais-duvidas")
 
 
 // ---------- Quem pode o quê ----------
+
 // Nas dúvidas gerais todo mundo participa. Nas da equipe, só quem é da equipe (ou o admin).
 function podeParticiparDasDuvidas() {
   return (
@@ -39,6 +40,7 @@ function podeGerenciar(item) {
   }
   return perfil.papel === "lider" && item.equipe !== null && perfil.equipe === item.equipe
 }
+
 
 // ---------- Começo ----------
 // Chame com null (dúvidas gerais) ou com o nome da equipe
@@ -113,6 +115,7 @@ formDuvida.addEventListener("submit", async function (evento) {
   marcarFiltro()
   await mostrarDuvidas(true)
 })
+
 
 // ---------- Lista de dúvidas ----------
 async function mostrarDuvidas(destacarPrimeira) {
