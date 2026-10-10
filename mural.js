@@ -2,7 +2,7 @@ const PASTA_FOTOS = "fotos"
 const POSTS_POR_VEZ = 20
 const TAMANHO_MAXIMO_DA_FOTO = 1500000
 
-// Coração (texto fixo, sem dados de usuário). O CSS pinta o contorno ou o preenchimento.
+// Coração
 const ICONE_CORACAO =
   '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' +
   '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>' +
@@ -12,7 +12,7 @@ const ICONE_CORACAO =
 let equipeDoMural = null
 let limiteDePosts = POSTS_POR_VEZ
 
-// Foto já reduzida (Blob), pronta para enviar
+// Foto já reduzida pronta para enviar
 let fotoEscolhida = null
 let enderecoDaPrevia = null
 
@@ -67,9 +67,7 @@ function carregarImagem(arquivo) {
   })
 }
 
-// Reduz a foto no próprio navegador antes de enviar (celular tira fotos
-// de vários MB, e o espaço grátis do Supabase é limitado).
-// Devolve um Blob JPEG, ou null se não conseguir.
+// Reduz a foto no próprio navegador antes de enviar.
 async function comprimirFoto(arquivo) {
   let imagem
   try {
@@ -165,7 +163,7 @@ formPost.addEventListener("submit", async function (evento) {
   msgPost.textContent = ""
   ocupado(botaoPublicar, true, "Publicar")
 
-  // 1. Envia a foto (se houver). Fica na pasta com o id de quem enviou.
+  //Envia a foto.E Fica na pasta com o id de quem enviou.
   let caminho = null
   if (fotoEscolhida) {
     caminho = perfil.id + "/" + nomeUnico() + ".jpg"
@@ -180,7 +178,7 @@ formPost.addEventListener("submit", async function (evento) {
     }
   }
 
-  // 2. Cria a postagem
+  //Cria a postagem
   const resposta = await cliente
     .from("posts")
     .insert({ equipe: equipeDoMural, texto: texto, foto_caminho: caminho })
@@ -258,7 +256,7 @@ function podeApagarPost(post) {
 function criarCartaoDePost(post) {
   const cartao = criarElemento("article", "post")
 
-  // Topo: nome, data e botão de apagar
+  // nome, data e botão de apagar
   const topo = criarElemento("div", "post-topo")
   topo.appendChild(criarElemento("span", "post-nome", post.profiles ? post.profiles.nome : "Usuário"))
   topo.appendChild(criarElemento("span", "post-data", formatarData(post.criado_em)))
@@ -278,7 +276,7 @@ function criarCartaoDePost(post) {
     cartao.appendChild(criarElemento("p", "post-texto-conteudo", post.texto))
   }
 
-  // Foto (clicar abre a foto inteira em outra aba)
+  // Foto,se clicar vai abrir a foto inteira em outra aba
   if (post.foto_caminho) {
     const link = criarElemento("a", "post-foto-link")
     link.href = enderecoDaFoto(post.foto_caminho)
@@ -303,7 +301,7 @@ async function apagarPost(post) {
     return
   }
 
-  // Primeiro a foto, depois a postagem (a permissão da foto depende da postagem existir)
+  // Primeiro a foto, depois a postagem,só é permitido se a foto existir
   if (post.foto_caminho) {
     await cliente.storage.from(PASTA_FOTOS).remove([post.foto_caminho])
   }
