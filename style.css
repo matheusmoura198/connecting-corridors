@@ -364,15 +364,16 @@ a {
 .logo-palco img {
   position: relative;
   width: 100%;
-  animation: flutuar 5s ease-in-out infinite alternate;
+  animation: flutuar 3s ease-in-out infinite alternate;
 }
 
 @keyframes flutuar {
-  from {
+  0%, 100% {
     transform: translateY(0);
   }
-  to {
-    transform: translateY(-14px);
+
+  50% {
+    transform: translateY(-15px);
   }
 }
 
