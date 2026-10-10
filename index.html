@@ -7,7 +7,7 @@
   <title>Runners Conecting</title>
   <link rel="icon" href="img/logo.png" type="image/png">
 
-  <!-- Fontes (só visual). Se ficarem sem internet, o navegador usa uma fonte parecida. -->
+  <!-- Fontes.Se ficarem sem internet, o navegador usa uma fonte parecida. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
@@ -16,9 +16,7 @@
 </head>
 <body>
 
-  <!-- =========================================================
-       TELA 1: LOGIN / CADASTRO
-       ========================================================= -->
+  <!-- Cadastro ou login -->
   <main id="tela-login" class="tela-login" hidden>
     <div class="login-caixa">
       <img class="login-logo" src="img/logo.png" alt="Logo do Runners Conecting" width="120" height="120">
@@ -30,7 +28,7 @@
         <button type="button" id="aba-criar" class="aba" role="tab" aria-selected="false" aria-controls="form-criar">Criar conta</button>
       </div>
 
-      <!-- Formulário: entrar -->
+      <!-- Formulário para entrar -->
       <form id="form-entrar" class="formulario" novalidate>
         <div class="campo">
           <label for="entrar-email">Email</label>
@@ -44,7 +42,7 @@
         <button type="submit" class="botao">Entrar</button>
       </form>
 
-      <!-- Formulário: criar conta -->
+      <!-- Formulário para criar conta -->
       <form id="form-criar" class="formulario" hidden novalidate>
         <div class="campo">
           <label for="criar-nome">Nome de usuário</label>
@@ -64,9 +62,7 @@
     </div>
   </main>
 
-  <!-- =========================================================
-       TELA 2: O SITE (aparece depois do login)
-       ========================================================= -->
+  <!-- Depois do login entra no site -->
   <div id="tela-site" hidden>
 
     <header class="topo">
@@ -87,7 +83,7 @@
 
     <main>
 
-      <!-- INÍCIO -->
+      <!-- Início -->
       <section id="inicio" class="secao">
         <div class="container">
           <div class="heroi">
@@ -131,14 +127,14 @@
           <h2 class="titulo-secao">Escolha sua equipe</h2>
           <p class="texto-secao">Toque na foto da sua equipe para entrar na página dela.</p>
 
-          <!-- As equipes vêm da tabela "equipes" do Supabase (veja desenharEquipes no script.js) -->
+          <!-- As equipes vêm da tabela "equipes" do Supabase -->
           <div id="equipes-grade" class="equipes-grade"></div>
 
           <p id="aviso-equipe" class="aviso-equipe" aria-live="polite"></p>
         </div>
       </section>
 
-      <!-- COMUNIDADE -->
+      <!-- Comunidade -->
       <section id="comunidade" class="secao">
         <div class="container">
           <h2 class="titulo-secao">Comunidade</h2>
@@ -174,7 +170,7 @@
         </div>
       </section>
 
-      <!-- SUGESTÕES -->
+      <!-- Sugestões -->
       <section id="sugestoes" class="secao secao-clara">
         <div class="container container-estreito">
           <h2 class="titulo-secao">O que podemos melhorar?</h2>
@@ -201,7 +197,7 @@
 
   </div>
 
-  <!-- Biblioteca do Supabase (única biblioteca externa do site) -->
+  <!-- Biblioteca do Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script src="comum.js"></script>
