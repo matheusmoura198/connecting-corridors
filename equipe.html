@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0A55DB">
+  <title>Equipe | Conecting Corridors</title>
+  <link rel="icon" href="img/logo.png" type="image/png">
+
+  <!-- Fontes (só visual). Se ficarem sem internet, o navegador usa uma fonte parecida. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- A página só aparece depois que o script confirma que você está logado -->
+  <div id="pagina" hidden>
+
+    <header class="topo">
+      <div class="topo-conteudo">
+        <a class="marca" href="index.html#inicio">
+          <img src="img/logo.png" alt="" width="36" height="36">
+          <span>Conecting Corridors</span>
+        </a>
+        <button type="button" id="botao-sair" class="botao-sair">Sair</button>
+        <nav class="menu" aria-label="Seções da página">
+          <a href="index.html#inicio">Início</a>
+          <a href="index.html#equipes">Equipes</a>
+          <a href="#treinos">Treinos</a>
+          <a href="#integrantes">Integrantes</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- CAPA DA EQUIPE -->
+      <section class="equipe-topo">
+        <div class="container">
+          <div class="equipe-capa">
+            <img id="equipe-foto" src="" alt="">
+            <h1 id="equipe-titulo" class="equipe-capa-titulo"></h1>
+          </div>
+
+          <p id="equipe-situacao" class="equipe-situacao"></p>
+          <button type="button" id="botao-entrar-equipe" class="botao" hidden>Passar para esta equipe</button>
+          <p id="msg-equipe" class="mensagem" role="alert"></p>
+        </div>
+      </section>
+
+      <!-- TREINOS -->
+      <section id="treinos" class="secao">
+        <div class="container">
+          <h2 class="titulo-secao">Treinos</h2>
+          <p id="texto-treinos" class="texto-secao">Os próximos treinos da equipe, definidos pelo líder.</p>
+
+          <!-- Só o líder da equipe (e o admin) vê esta parte -->
+          <details id="area-lider" class="area-lider" hidden>
+            <summary id="resumo-treino">Marcar novo treino</summary>
+
+            <form id="form-treino" class="formulario form-treino" novalidate>
+              <div class="campo-dupla">
+                <div class="campo">
+                  <label for="treino-dia">Dia</label>
+                  <input id="treino-dia" type="date" required>
+                </div>
+                <div class="campo">
+                  <label for="treino-horario">Horário</label>
+                  <input id="treino-horario" type="time" required>
+                </div>
+              </div>
+
+              <div class="campo">
+                <label for="treino-local">Local de saída</label>
+                <input id="treino-local" type="text" maxlength="100" required>
+              </div>
+
+              <div class="campo">
+                <label for="treino-tipo">Tipo de treino (opcional)</label>
+                <input id="treino-tipo" type="text" maxlength="60">
+              </div>
+
+              <div class="campo">
+                <label for="treino-observacao">Observação (opcional)</label>
+                <textarea id="treino-observacao" rows="3" maxlength="300"></textarea>
+              </div>
+
+              <p id="msg-treino" class="mensagem" role="alert"></p>
+
+              <div class="form-botoes">
+                <button type="submit" id="botao-salvar-treino" class="botao">Marcar treino</button>
+                <button type="button" id="botao-cancelar-treino" class="botao-sair" hidden>Cancelar edição</button>
+              </div>
+            </form>
+          </details>
+
+          <p id="aviso-presenca" class="aviso-equipe" hidden></p>
+
+          <div id="lista-treinos" class="lista-treinos"></div>
+          <p id="sem-treinos" class="vazio">Nenhum treino marcado por enquanto.</p>
+        </div>
+      </section>
+
+      <!-- INTEGRANTES -->
+      <section id="integrantes" class="secao secao-clara">
+        <div class="container">
+          <h2 class="titulo-secao">Integrantes</h2>
+          <p id="total-integrantes" class="texto-secao"></p>
+          <ul id="lista-integrantes" class="lista-integrantes"></ul>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="rodape">
+      <div class="container">
+        <p>Conecting Corridors. Equipes de corrida da região, organizadas.</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Biblioteca do Supabase (única biblioteca externa do site) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="comum.js"></script>
+  <script src="equipe.js"></script>
+</body>
+</html>
