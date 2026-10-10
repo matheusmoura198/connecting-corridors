@@ -965,3 +965,391 @@ a {
     transition: none;
   }
 }
+
+/* =========================================================
+   ETAPA 4 - MURAL: POSTAGENS COM FOTO E CURTIDAS
+   ========================================================= */
+
+.mural {
+  max-width: 680px;
+}
+
+.form-post {
+  margin-bottom: 2rem;
+}
+
+.post-foto-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+/* O botão nativo de arquivo fica escondido; quem aparece é o rótulo estilizado */
+.campo-arquivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.botao-arquivo {
+  padding: 0.55rem 1.1rem;
+  font-weight: 600;
+  color: var(--azul);
+  background: var(--branco);
+  border: 2px solid var(--azul);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.botao-arquivo:hover {
+  background: var(--azul-claro);
+}
+
+.campo-arquivo:focus-visible + .botao-arquivo {
+  outline: 3px solid var(--azul);
+  outline-offset: 3px;
+}
+
+.previa-foto {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.previa-foto img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+}
+
+.lista-posts {
+  display: grid;
+  gap: 1rem;
+}
+
+.post {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+}
+
+.post.novo {
+  animation: entrar 0.4s ease;
+}
+
+.post-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+
+.post-nome {
+  font-weight: 600;
+}
+
+.post-data {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.post-apagar {
+  margin-left: auto;
+}
+
+.post-texto-conteudo {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.post-foto-link {
+  display: block;
+  overflow: hidden;
+  background: var(--azul-claro);
+  border-radius: 12px;
+}
+
+.post-foto {
+  display: block;
+  width: 100%;
+  max-height: 560px;
+  object-fit: contain;
+}
+
+/* ---------- Curtir ---------- */
+
+.botao-curtir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-self: start;
+  padding: 0.35rem 0.8rem;
+  font-family: var(--fonte-texto);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  background: var(--branco);
+  border: 1.5px solid var(--linha);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.botao-curtir:hover {
+  color: var(--azul);
+  border-color: var(--azul);
+}
+
+.botao-curtir:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.botao-curtir svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.botao-curtir[aria-pressed="true"] {
+  color: var(--azul);
+  background: var(--azul-claro);
+  border-color: var(--azul);
+}
+
+.botao-curtir[aria-pressed="true"] svg {
+  fill: currentColor;
+}
+
+.botao-curtir.curtiu svg {
+  animation: pulo 0.35s ease;
+}
+
+.curtir-total:empty {
+  display: none;
+}
+
+@keyframes pulo {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post.novo,
+  .botao-curtir.curtiu svg {
+    animation: none;
+  }
+
+  .botao-arquivo,
+  .botao-curtir {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   ETAPA 5 - DÚVIDAS E RESPOSTAS
+   ========================================================= */
+
+.duvidas {
+  max-width: 680px;
+}
+
+.form-duvida {
+  margin-bottom: 2rem;
+}
+
+/* Filtro "Em aberto / Resolvidas": fundo branco para aparecer também nas seções azuis claras */
+.abas-duvidas {
+  max-width: 320px;
+  margin-bottom: 1.25rem;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+}
+
+.lista-duvidas {
+  display: grid;
+  gap: 1rem;
+}
+
+.duvida {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+}
+
+.duvida.novo {
+  animation: entrar 0.4s ease;
+}
+
+.duvida-topo,
+.resposta-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+
+.duvida-autor {
+  font-weight: 600;
+}
+
+.duvida-data {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.duvida-etiqueta {
+  padding: 0.1rem 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sucesso);
+  background: #e3f3ea;
+  border-radius: 999px;
+}
+
+.duvida-titulo {
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.duvida-resolvida .duvida-titulo {
+  color: var(--texto-suave);
+}
+
+.duvida-detalhe {
+  color: var(--texto-suave);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.respostas {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  background: var(--azul-claro);
+  border-radius: 10px;
+}
+
+.resposta-apagar {
+  margin-left: auto;
+}
+
+.resposta-texto {
+  margin-top: 0.15rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.duvida-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--linha);
+}
+
+.duvida-total {
+  margin-right: auto;
+  font-size: 0.95rem;
+  color: var(--texto-suave);
+}
+
+.form-resposta {
+  padding-top: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .duvida.novo {
+    animation: none;
+  }
+}
+
+/* =========================================================
+   VERSÃO FINAL - TERMOS, ACEITE E AVISOS
+   ========================================================= */
+
+.aceite {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.aceite input {
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.15rem;
+  accent-color: var(--azul);
+}
+
+.login-rodape {
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+}
+
+.aviso-noscript {
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+  color: var(--branco);
+  background: var(--azul-escuro);
+}
+
+.rodape a {
+  color: var(--texto-suave);
+  text-underline-offset: 3px;
+}
+
+.rodape a:hover {
+  color: var(--azul);
+}
+
+/* Página de termos e privacidade */
+.texto-longo h2 {
+  margin-top: 2rem;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--azul-escuro);
+}
+
+.texto-longo p,
+.texto-longo li {
+  margin-top: 0.5rem;
+  max-width: 62ch;
+}
+
+.texto-longo ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.texto-atualizado {
+  margin-top: 0.5rem;
+  color: var(--texto-suave);
+}
