@@ -1,13 +1,3 @@
-// =========================================================
-// CONECTING CORRIDORS - ETAPA 2
-//
-// Agora o login e os dados são de verdade, guardados no
-// Supabase e compartilhados entre todos os usuários.
-// O que você precisa preencher fica em supabase-config.js.
-// O código que as duas páginas dividem está em comum.js.
-// =========================================================
-
-
 // ---------- Elementos da página ----------
 const telaLogin = document.getElementById("tela-login")
 const telaSite = document.getElementById("tela-site")
@@ -25,10 +15,6 @@ const nomeUsuario = document.getElementById("nome-usuario")
 const gradeEquipes = document.getElementById("equipes-grade")
 const avisoEquipe = document.getElementById("aviso-equipe")
 
-const formComentario = document.getElementById("form-comentario")
-const comentarioTexto = document.getElementById("comentario-texto")
-const listaComentarios = document.getElementById("lista-comentarios")
-const semComentarios = document.getElementById("sem-comentarios")
 
 const formSugestao = document.getElementById("form-sugestao")
 const sugestaoTexto = document.getElementById("sugestao-texto")
@@ -72,7 +58,7 @@ async function mostrarTela() {
   await carregarEquipes()
   desenharEquipes()
   marcarEquipe(perfil.equipe)
-  await mostrarComentarios(false)
+  iniciarMural(null)
 }
 
 
@@ -286,100 +272,6 @@ async function abrirEquipe(tile) {
 
   window.location.href = "equipe.html?equipe=" + tile.dataset.slug
 }
-
-
-// ---------- Comentários da comunidade ----------
-
-// Desenha a lista de comentários. Se "destacarPrimeiro" for true,
-// o comentário mais recente aparece com uma pequena animação.
-async function mostrarComentarios(destacarPrimeiro) {
-  const resposta = await cliente
-    .from("comentarios")
-    .select("id, texto, criado_em, user_id, profiles(nome)")
-    .order("criado_em", { ascending: false })
-    .limit(50)
-
-  listaComentarios.innerHTML = ""
-
-  if (resposta.error) {
-    semComentarios.textContent = "Não foi possível carregar os comentários agora."
-    semComentarios.hidden = false
-    return
-  }
-
-  semComentarios.textContent = "Ainda não há comentários. Escreva o primeiro."
-  semComentarios.hidden = resposta.data.length > 0
-
-  resposta.data.forEach(function (comentario, posicao) {
-    const caixa = document.createElement("article")
-    caixa.className = "comentario"
-    if (destacarPrimeiro && posicao === 0) {
-      caixa.classList.add("novo")
-    }
-
-    const topo = document.createElement("div")
-    topo.className = "comentario-topo"
-
-    const nome = document.createElement("span")
-    nome.className = "comentario-nome"
-    nome.textContent = comentario.profiles ? comentario.profiles.nome : "Usuário"
-
-    const data = document.createElement("span")
-    data.className = "comentario-data"
-    data.textContent = formatarData(comentario.criado_em)
-
-    topo.appendChild(nome)
-    topo.appendChild(data)
-
-    // Só quem escreveu (ou o admin) vê o botão de apagar
-    if (perfil && (perfil.id === comentario.user_id || perfil.papel === "admin")) {
-      const apagar = document.createElement("button")
-      apagar.type = "button"
-      apagar.className = "comentario-apagar"
-      apagar.textContent = "Apagar"
-      apagar.addEventListener("click", async function () {
-        if (!window.confirm("Apagar este comentário?")) {
-          return
-        }
-        await cliente.from("comentarios").delete().eq("id", comentario.id)
-        await mostrarComentarios(false)
-      })
-      topo.appendChild(apagar)
-    }
-
-    const texto = document.createElement("p")
-    texto.className = "comentario-texto"
-    texto.textContent = comentario.texto
-
-    caixa.appendChild(topo)
-    caixa.appendChild(texto)
-    listaComentarios.appendChild(caixa)
-  })
-}
-
-formComentario.addEventListener("submit", async function (evento) {
-  evento.preventDefault()
-
-  const texto = comentarioTexto.value.trim()
-  if (!perfil || texto === "") {
-    return
-  }
-
-  const botao = formComentario.querySelector("button[type=submit]")
-  ocupado(botao, true, "Publicar comentário")
-
-  const resposta = await cliente.from("comentarios").insert({ texto: texto })
-
-  ocupado(botao, false, "Publicar comentário")
-
-  if (resposta.error) {
-    window.alert("Não foi possível publicar o comentário. Tente de novo.")
-    return
-  }
-
-  comentarioTexto.value = ""
-  await mostrarComentarios(true)
-})
 
 
 // ---------- Sugestões ----------
