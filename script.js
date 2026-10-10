@@ -59,6 +59,7 @@ async function mostrarTela() {
   desenharEquipes()
   marcarEquipe(perfil.equipe)
   iniciarMural(null)
+  iniciarDuvidas(null)
 }
 
 
@@ -106,11 +107,15 @@ formCriar.addEventListener("submit", async function (evento) {
     msgCriar.textContent = "A senha precisa ter pelo menos 6 caracteres."
     return
   }
+  if (!document.getElementById("criar-aceite").checked) {
+    msgCriar.textContent = "Marque a caixa para aceitar os termos e a política de privacidade."
+    return
+  }
 
   msgCriar.textContent = ""
   ocupado(botao, true, "Criar conta")
 
-  // O nome de usuário está livre?
+  // 1. O nome de usuário está livre?
   const disponivel = await cliente.rpc("nome_disponivel", { n: nome })
   if (disponivel.error) {
     msgCriar.textContent = mensagemDeErro(disponivel.error)
@@ -123,7 +128,7 @@ formCriar.addEventListener("submit", async function (evento) {
     return
   }
 
-  // Cria a conta,o perfil vai ser criado sozinho pelo banco de dados
+  // 2. Cria a conta (o perfil é criado sozinho pelo banco de dados)
   const resposta = await cliente.auth.signUp({
     email: email,
     password: senha,
@@ -139,7 +144,7 @@ formCriar.addEventListener("submit", async function (evento) {
 
   formCriar.reset()
 
-  // Enquanto o Supabase pedir confirmação por email, não haverá sessão
+  // Se o Supabase pede confirmação por email, ainda não há sessão
   if (!resposta.data.session) {
     trocarAba("entrar")
     msgEntrar.classList.add("ok")
@@ -194,7 +199,7 @@ botaoSair.addEventListener("click", async function () {
 
 // ---------- Escolha da equipe ----------
 
-// Isso vai criar um quadro clicável para cada equipe que existe na tabela "equipes"
+// Cria um quadro clicável para cada equipe que existe na tabela "equipes"
 function desenharEquipes() {
   gradeEquipes.innerHTML = ""
 
@@ -214,7 +219,7 @@ function desenharEquipes() {
       imagem.addEventListener("error", function () {
         imagem.hidden = true
       })
-      imagem.src = "img/".foto
+      imagem.src = equipe.foto
       tile.appendChild(imagem)
     }
 
@@ -307,5 +312,5 @@ formSugestao.addEventListener("submit", async function (evento) {
 })
 
 
-// ---------- decide qual tela mostrar dependendo de condições anteriores----------
+// ---------- Começo: decide qual tela mostrar ----------
 mostrarTela()
