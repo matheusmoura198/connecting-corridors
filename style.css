@@ -13,6 +13,8 @@
   --fonte-texto: "Barlow", "Segoe UI", Arial, sans-serif;
 }
 
+/* ---------- Base ---------- */
+
 * {
   box-sizing: border-box;
 }
@@ -30,6 +32,7 @@ body {
   background: var(--branco);
 }
 
+/* Garante que o atributo "hidden" sempre esconde o elemento */
 [hidden] {
   display: none !important;
 }
@@ -71,6 +74,8 @@ a {
   max-width: 640px;
 }
 
+/* ---------- Botões ---------- */
+
 .botao {
   display: inline-block;
   padding: 0.8rem 1.5rem;
@@ -104,6 +109,8 @@ a {
 .link-simples:hover {
   color: var(--azul);
 }
+
+/* ---------- Formulários ---------- */
 
 .formulario {
   display: grid;
@@ -154,6 +161,8 @@ a {
 .mensagem.ok {
   color: var(--sucesso);
 }
+
+/* ---------- Tela de login ---------- */
 
 .tela-login {
   min-height: 100vh;
@@ -220,6 +229,8 @@ a {
   background: var(--azul);
 }
 
+/* ---------- Topo e menu ---------- */
+
 .topo {
   position: sticky;
   top: 0;
@@ -268,6 +279,7 @@ a {
   border-color: var(--azul);
 }
 
+/* No celular o menu fica numa linha própria, que rola para o lado se precisar */
 .menu {
   display: flex;
   gap: 1.25rem;
@@ -292,8 +304,11 @@ a {
   border-bottom-color: var(--azul);
 }
 
+/* ---------- Seções ---------- */
+
 .secao {
   padding: 3.5rem 0;
+  /* Evita que o topo fixo cubra o título quando se clica numa âncora */
   scroll-margin-top: 6.5rem;
 }
 
@@ -312,6 +327,8 @@ a {
   color: var(--texto-suave);
 }
 
+/* ---------- Início: logo flutuando com LED ---------- */
+
 .heroi {
   display: grid;
   gap: 1.5rem;
@@ -319,6 +336,7 @@ a {
   padding: 1rem 0 3rem;
 }
 
+/* No celular a logo vem primeiro */
 .logo-palco {
   position: relative;
   display: grid;
@@ -327,6 +345,7 @@ a {
   margin: 0 auto;
 }
 
+/* O LED: um brilho azul suave que "respira" atrás da logo */
 .logo-palco::before {
   content: "";
   position: absolute;
@@ -389,6 +408,8 @@ a {
   gap: 1rem 1.5rem;
 }
 
+/* ---------- Início: para que serve ---------- */
+
 .sobre {
   padding-top: 2.5rem;
   border-top: 1px solid var(--linha);
@@ -422,6 +443,8 @@ a {
   max-width: 60ch;
   color: var(--texto-suave);
 }
+
+/* ---------- Equipes ---------- */
 
 .equipes-grade {
   display: grid;
@@ -457,6 +480,7 @@ a {
   object-fit: cover;
 }
 
+/* Faixa escura embaixo para o nome ficar legível sobre qualquer foto */
 .equipe-tile::after {
   content: "";
   position: absolute;
@@ -476,6 +500,7 @@ a {
   line-height: 1.05;
 }
 
+/* O selo só aparece na equipe escolhida */
 .equipe-selo {
   position: absolute;
   top: 0.9rem;
@@ -504,6 +529,8 @@ a {
   font-weight: 600;
   color: var(--azul-escuro);
 }
+
+/* ---------- Comunidade ---------- */
 
 .comunidade-grade {
   display: grid;
@@ -556,12 +583,30 @@ a {
   color: var(--texto-suave);
 }
 
+.comentario-apagar {
+  margin-left: auto;
+  padding: 0;
+  font-family: var(--fonte-texto);
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  background: none;
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.comentario-apagar:hover {
+  color: var(--erro);
+}
+
 .comentario-texto {
   margin-top: 0.25rem;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
+/* O comentário recém-publicado aparece com uma entrada suave */
 .comentario.novo {
   animation: entrar 0.4s ease;
 }
@@ -581,12 +626,16 @@ a {
   color: var(--texto-suave);
 }
 
+/* ---------- Rodapé ---------- */
+
 .rodape {
   padding: 2rem 0;
   font-size: 0.95rem;
   color: var(--texto-suave);
   border-top: 1px solid var(--linha);
 }
+
+/* ---------- Telas maiores ---------- */
 
 @media (min-width: 760px) {
   .topo-conteudo {
@@ -615,6 +664,7 @@ a {
     padding: 2rem 0 4rem;
   }
 
+  /* No computador o texto fica à esquerda e a logo à direita */
   .logo-palco {
     order: 2;
     width: min(100%, 440px);
@@ -640,6 +690,7 @@ a {
   }
 }
 
+/* Quem prefere menos movimento no celular/computador não vê a animação */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
