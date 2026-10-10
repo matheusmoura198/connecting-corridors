@@ -112,3 +112,15 @@ async function obterPerfilLogado() {
   }
   return await carregarPerfil(sessao.user.id)
 }
+
+// Cria um elemento HTML já com classe e texto (o texto entra como texto, nunca como HTML)
+function criarElemento(tag, classe, texto) {
+  const elemento = document.createElement(tag)
+  if (classe) {
+    elemento.className = classe
+  }
+  if (texto !== undefined) {
+    elemento.textContent = texto
+  }
+  return elemento
+}
