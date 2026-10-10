@@ -30,6 +30,7 @@
           <a href="index.html#inicio">Início</a>
           <a href="index.html#equipes">Equipes</a>
           <a href="#treinos">Treinos</a>
+          <a href="#mural">Mural</a>
           <a href="#integrantes">Integrantes</a>
         </nav>
       </div>
@@ -104,8 +105,44 @@
         </div>
       </section>
 
+      <!-- MURAL -->
+      <section id="mural" class="secao secao-clara">
+        <div class="container">
+          <h2 class="titulo-secao">Mural</h2>
+          <p class="texto-secao">Fotos e mensagens da equipe. Todo mundo pode curtir.</p>
+
+          <div class="mural">
+            <p id="aviso-mural" class="aviso-equipe" hidden>Só integrantes desta equipe publicam no mural. Você pode ver as postagens e curtir.</p>
+
+            <form id="form-post" class="formulario form-post" novalidate>
+              <div class="campo">
+                <label for="post-texto">Escreva uma mensagem</label>
+                <textarea id="post-texto" rows="3" maxlength="500"></textarea>
+              </div>
+
+              <div class="post-foto-linha">
+                <input id="post-foto" class="campo-arquivo" type="file" accept="image/*">
+                <label for="post-foto" class="botao-arquivo">Adicionar foto</label>
+
+                <div id="previa-foto" class="previa-foto" hidden>
+                  <img id="previa-imagem" alt="Prévia da foto escolhida">
+                  <button type="button" id="botao-remover-foto" class="botao-texto botao-texto-perigo">Remover foto</button>
+                </div>
+              </div>
+
+              <p id="msg-post" class="mensagem" role="alert"></p>
+              <button type="submit" id="botao-publicar" class="botao">Publicar</button>
+            </form>
+
+            <div id="lista-posts" class="lista-posts"></div>
+            <p id="sem-posts" class="vazio">Ainda não há postagens. Seja a primeira pessoa a publicar.</p>
+            <button type="button" id="botao-mais-posts" class="botao-sair" hidden>Ver postagens mais antigas</button>
+          </div>
+        </div>
+      </section>
+
       <!-- INTEGRANTES -->
-      <section id="integrantes" class="secao secao-clara">
+      <section id="integrantes" class="secao">
         <div class="container">
           <h2 class="titulo-secao">Integrantes</h2>
           <p id="total-integrantes" class="texto-secao"></p>
@@ -127,6 +164,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script src="comum.js"></script>
+  <script src="mural.js"></script>
   <script src="equipe.js"></script>
 </body>
 </html>
