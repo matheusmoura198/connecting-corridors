@@ -5,9 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0A55DB">
   <title>Runners Conecting</title>
+  <meta name="description" content="Treinos, fotos e dúvidas das equipes de corrida da região, num só lugar.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Runners Conecting">
+  <meta property="og:title" content="Runners Conecting">
+  <meta property="og:description" content="Treinos, fotos e dúvidas das equipes de corrida da região, num só lugar.">
+  <!-- Depois de comprar o domínio, troque o endereço da imagem pelo do seu domínio -->
+  <meta property="og:image" content="https://matheusmoura198.github.io/runners-conecting/img/logo.png">
+  <meta name="twitter:card" content="summary">
   <link rel="icon" href="img/logo.png" type="image/png">
 
-  <!-- Fontes.Se ficarem sem internet, o navegador usa uma fonte parecida. -->
+  <!-- Fontes (só visual). Se ficarem sem internet, o navegador usa uma fonte parecida. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
@@ -16,7 +25,13 @@
 </head>
 <body>
 
-  <!-- Cadastro ou login -->
+  <noscript>
+    <p class="aviso-noscript">Este site precisa do JavaScript ativado para funcionar.</p>
+  </noscript>
+
+  <!-- =========================================================
+       TELA 1: LOGIN / CADASTRO
+       ========================================================= -->
   <main id="tela-login" class="tela-login" hidden>
     <div class="login-caixa">
       <img class="login-logo" src="img/logo.png" alt="Logo do Runners Conecting" width="120" height="120">
@@ -28,7 +43,7 @@
         <button type="button" id="aba-criar" class="aba" role="tab" aria-selected="false" aria-controls="form-criar">Criar conta</button>
       </div>
 
-      <!-- Formulário para entrar -->
+      <!-- Formulário: entrar -->
       <form id="form-entrar" class="formulario" novalidate>
         <div class="campo">
           <label for="entrar-email">Email</label>
@@ -42,7 +57,7 @@
         <button type="submit" class="botao">Entrar</button>
       </form>
 
-      <!-- Formulário para criar conta -->
+      <!-- Formulário: criar conta -->
       <form id="form-criar" class="formulario" hidden novalidate>
         <div class="campo">
           <label for="criar-nome">Nome de usuário</label>
@@ -56,13 +71,21 @@
           <label for="criar-senha">Senha (mínimo de 6 caracteres)</label>
           <input id="criar-senha" type="password" autocomplete="new-password" required>
         </div>
+        <div class="aceite">
+          <input id="criar-aceite" type="checkbox">
+          <label for="criar-aceite">Li e aceito os <a href="privacidade.html" target="_blank" rel="noopener">termos e a política de privacidade</a>. Meu nome de usuário, minha equipe e minhas postagens ficarão visíveis para os outros usuários.</label>
+        </div>
         <p id="msg-criar" class="mensagem" role="alert"></p>
         <button type="submit" class="botao">Criar conta</button>
       </form>
+
+      <p class="login-rodape"><a href="privacidade.html">Termos e privacidade</a></p>
     </div>
   </main>
 
-  <!-- Depois do login entra no site -->
+  <!-- =========================================================
+       TELA 2: O SITE (aparece depois do login)
+       ========================================================= -->
   <div id="tela-site" hidden>
 
     <header class="topo">
@@ -76,6 +99,7 @@
           <a href="#inicio">Início</a>
           <a href="#equipes">Equipes</a>
           <a href="#comunidade">Comunidade</a>
+          <a href="#duvidas">Dúvidas</a>
           <a href="#sugestoes">Sugestões</a>
         </nav>
       </div>
@@ -83,7 +107,7 @@
 
     <main>
 
-      <!-- Início -->
+      <!-- INÍCIO -->
       <section id="inicio" class="secao">
         <div class="container">
           <div class="heroi">
@@ -127,14 +151,14 @@
           <h2 class="titulo-secao">Escolha sua equipe</h2>
           <p class="texto-secao">Toque na foto da sua equipe para entrar na página dela.</p>
 
-          <!-- As equipes vêm da tabela "equipes" do Supabase -->
+          <!-- As equipes vêm da tabela "equipes" do Supabase (veja desenharEquipes no script.js) -->
           <div id="equipes-grade" class="equipes-grade"></div>
 
           <p id="aviso-equipe" class="aviso-equipe" aria-live="polite"></p>
         </div>
       </section>
 
-      <!-- Comunidade -->
+      <!-- COMUNIDADE -->
       <section id="comunidade" class="secao">
         <div class="container">
           <h2 class="titulo-secao">Comunidade</h2>
@@ -170,8 +194,42 @@
         </div>
       </section>
 
-      <!-- Sugestões -->
-      <section id="sugestoes" class="secao secao-clara">
+      <!-- DÚVIDAS -->
+      <section id="duvidas" class="secao secao-clara">
+        <div class="container">
+          <h2 class="titulo-secao">Dúvidas</h2>
+          <p class="texto-secao">Pergunte o que quiser sobre corrida e sobre as equipes. Quem já passou pela mesma dúvida responde.</p>
+
+          <div class="duvidas">
+            <p id="aviso-duvidas" class="aviso-equipe" hidden>Só integrantes desta equipe perguntam e respondem aqui. Você pode ler as dúvidas.</p>
+
+            <form id="form-duvida" class="formulario form-duvida" novalidate>
+              <div class="campo">
+                <label for="duvida-titulo">Qual é a sua dúvida?</label>
+                <input id="duvida-titulo" type="text" maxlength="120">
+              </div>
+              <div class="campo">
+                <label for="duvida-detalhe">Detalhes (opcional)</label>
+                <textarea id="duvida-detalhe" rows="3" maxlength="500"></textarea>
+              </div>
+              <p id="msg-duvida" class="mensagem" role="alert"></p>
+              <button type="submit" id="botao-perguntar" class="botao">Perguntar</button>
+            </form>
+
+            <div class="abas abas-duvidas" role="tablist" aria-label="Filtrar dúvidas">
+              <button type="button" id="filtro-abertas" class="aba" role="tab" aria-selected="true">Em aberto</button>
+              <button type="button" id="filtro-resolvidas" class="aba" role="tab" aria-selected="false">Resolvidas</button>
+            </div>
+
+            <div id="lista-duvidas" class="lista-duvidas"></div>
+            <p id="sem-duvidas" class="vazio">Nenhuma dúvida em aberto. Faça a primeira pergunta.</p>
+            <button type="button" id="botao-mais-duvidas" class="botao-sair" hidden>Ver dúvidas mais antigas</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUGESTÕES -->
+      <section id="sugestoes" class="secao">
         <div class="container container-estreito">
           <h2 class="titulo-secao">O que podemos melhorar?</h2>
           <p class="texto-secao">Conte o que está faltando ou o que pode ficar melhor no site.</p>
@@ -191,17 +249,18 @@
 
     <footer class="rodape">
       <div class="container">
-        <p>Runners Conecting. Equipes de corrida da região, organizadas.</p>
+        <p>Runners Conecting. Equipes de corrida da região, organizadas. <a href="privacidade.html">Termos e privacidade</a></p>
       </div>
     </footer>
 
   </div>
 
-  <!-- Biblioteca do Supabase -->
+  <!-- Biblioteca do Supabase (única biblioteca externa do site) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script src="comum.js"></script>
   <script src="mural.js"></script>
+  <script src="duvidas.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
