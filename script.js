@@ -214,7 +214,7 @@ function desenharEquipes() {
       imagem.addEventListener("error", function () {
         imagem.hidden = true
       })
-      imagem.src = equipe.foto
+      imagem.src = "img/".foto
       tile.appendChild(imagem)
     }
 
