@@ -38,17 +38,6 @@ let treinoEmEdicao = null
 
 
 // ---------- Funções de apoio ----------
-function criarElemento(tag, classe, texto) {
-  const elemento = document.createElement(tag)
-  if (classe) {
-    elemento.className = classe
-  }
-  if (texto !== undefined) {
-    elemento.textContent = texto
-  }
-  return elemento
-}
-
 // Data de hoje no formato do banco: 2026-10-11
 function dataDeHoje() {
   const agora = new Date()
@@ -104,6 +93,7 @@ async function iniciar() {
   montarTopo()
   montarAreaDoLider()
   await mostrarTreinos()
+  iniciarMural(equipe.nome)
   await mostrarIntegrantes()
 }
 
