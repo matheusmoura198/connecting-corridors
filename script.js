@@ -1,3 +1,13 @@
+// =========================================================
+// CONECTING CORRIDORS - ETAPA 2
+//
+// Agora o login e os dados são de verdade, guardados no
+// Supabase e compartilhados entre todos os usuários.
+// O que você precisa preencher fica em supabase-config.js.
+// O código que as duas páginas dividem está em comum.js.
+// =========================================================
+
+
 // ---------- Elementos da página ----------
 const telaLogin = document.getElementById("tela-login")
 const telaSite = document.getElementById("tela-site")
@@ -12,7 +22,7 @@ const msgCriar = document.getElementById("msg-criar")
 const botaoSair = document.getElementById("botao-sair")
 const nomeUsuario = document.getElementById("nome-usuario")
 
-const equipeTiles = document.querySelectorAll(".equipe-tile")
+const gradeEquipes = document.getElementById("equipes-grade")
 const avisoEquipe = document.getElementById("aviso-equipe")
 
 const formComentario = document.getElementById("form-comentario")
@@ -59,6 +69,8 @@ async function mostrarTela() {
   telaLogin.hidden = true
   telaSite.hidden = false
   nomeUsuario.textContent = perfil.nome
+  await carregarEquipes()
+  desenharEquipes()
   marcarEquipe(perfil.equipe)
   await mostrarComentarios(false)
 }
@@ -195,8 +207,50 @@ botaoSair.addEventListener("click", async function () {
 
 
 // ---------- Escolha da equipe ----------
+
+// Cria um quadro clicável para cada equipe que existe na tabela "equipes"
+function desenharEquipes() {
+  gradeEquipes.innerHTML = ""
+
+  EQUIPES.forEach(function (equipe) {
+    const tile = document.createElement("button")
+    tile.type = "button"
+    tile.className = "equipe-tile"
+    tile.dataset.equipe = equipe.nome
+    tile.dataset.slug = equipe.slug
+    tile.setAttribute("aria-pressed", "false")
+
+    // Se a foto não existir, esconde a imagem quebrada e deixa
+    // aparecer o fundo azul com o nome da equipe.
+    if (equipe.foto) {
+      const imagem = document.createElement("img")
+      imagem.alt = "Foto da " + equipe.nome
+      imagem.addEventListener("error", function () {
+        imagem.hidden = true
+      })
+      imagem.src = equipe.foto
+      tile.appendChild(imagem)
+    }
+
+    const selo = document.createElement("span")
+    selo.className = "equipe-selo"
+    selo.textContent = "Sua equipe"
+
+    const nome = document.createElement("span")
+    nome.className = "equipe-nome"
+    nome.textContent = equipe.nome
+
+    tile.appendChild(selo)
+    tile.appendChild(nome)
+    tile.addEventListener("click", function () {
+      abrirEquipe(tile)
+    })
+    gradeEquipes.appendChild(tile)
+  })
+}
+
 function marcarEquipe(equipeEscolhida) {
-  equipeTiles.forEach(function (tile) {
+  gradeEquipes.querySelectorAll(".equipe-tile").forEach(function (tile) {
     const selecionada = tile.dataset.equipe === equipeEscolhida
     tile.classList.toggle("selecionada", selecionada)
     tile.setAttribute("aria-pressed", String(selecionada))
@@ -209,43 +263,29 @@ function marcarEquipe(equipeEscolhida) {
   }
 }
 
-equipeTiles.forEach(function (tile) {
-  tile.addEventListener("click", async function () {
-    if (!perfil) {
+async function abrirEquipe(tile) {
+  if (!perfil) {
+    return
+  }
+
+  // Quem ainda não tem equipe entra na equipe que clicou.
+  // Quem já tem equipe só abre a página (para trocar, usa o botão
+  // "Passar para esta equipe" dentro da página da equipe).
+  if (!perfil.equipe && perfil.papel === "integrante") {
+    const resposta = await cliente
+      .from("profiles")
+      .update({ equipe: tile.dataset.equipe })
+      .eq("id", perfil.id)
+
+    if (resposta.error) {
+      avisoEquipe.textContent = "Não foi possível salvar sua equipe. Tente de novo."
       return
     }
-
-    // Quem ainda não tem equipe entra na equipe que clicou.
-    // Quem já tem equipe só abre a página (para trocar, usa o botão
-    // "Passar para esta equipe" dentro da página da equipe).
-    if (perfil.equipe === "" && perfil.papel === "integrante") {
-      const resposta = await cliente
-        .from("profiles")
-        .update({ equipe: tile.dataset.equipe })
-        .eq("id", perfil.id)
-
-      if (resposta.error) {
-        avisoEquipe.textContent = "Não foi possível salvar sua equipe. Tente de novo."
-        return
-      }
-      perfil.equipe = tile.dataset.equipe
-    }
-
-    window.location.href = "equipe.html?equipe=" + tile.dataset.slug
-  })
-})
-
-// Se a foto da equipe ainda não existir, esconde a imagem quebrada
-// e deixa aparecer o fundo azul com o nome da equipe.
-document.querySelectorAll(".equipe-tile img").forEach(function (imagem) {
-  function esconderImagem() {
-    imagem.hidden = true
+    perfil.equipe = tile.dataset.equipe
   }
-  imagem.addEventListener("error", esconderImagem)
-  if (imagem.complete && imagem.naturalWidth === 0) {
-    esconderImagem()
-  }
-})
+
+  window.location.href = "equipe.html?equipe=" + tile.dataset.slug
+}
 
 
 // ---------- Comentários da comunidade ----------
