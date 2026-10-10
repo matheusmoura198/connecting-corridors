@@ -707,3 +707,264 @@ a {
     transition: none;
   }
 }
+
+/* =========================================================
+   ETAPA 3 - PÁGINA DA EQUIPE
+   ========================================================= */
+
+.equipe-topo {
+  padding: 1.5rem 0 0;
+}
+
+/* Capa: foto da equipe (ou fundo azul) com o nome por cima */
+.equipe-capa {
+  position: relative;
+  min-height: 190px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--azul-escuro), var(--azul));
+  border-radius: 18px;
+}
+
+.equipe-capa img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.equipe-capa::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 17, 22, 0) 35%, rgba(14, 17, 22, 0.8) 100%);
+}
+
+.equipe-capa-titulo {
+  position: absolute;
+  left: 1.25rem;
+  right: 1.25rem;
+  bottom: 1.1rem;
+  z-index: 1;
+  font-size: clamp(2.2rem, 7vw, 3.6rem);
+  font-weight: 800;
+  color: var(--branco);
+}
+
+.equipe-situacao {
+  margin: 1.1rem 0 0.75rem;
+  font-weight: 600;
+  color: var(--azul-escuro);
+}
+
+/* ---------- Formulário do líder ---------- */
+
+.area-lider {
+  margin-bottom: 2rem;
+  padding: 0 1.25rem;
+  background: var(--azul-claro);
+  border-radius: 14px;
+}
+
+.area-lider summary {
+  padding: 1rem 0;
+  font-family: var(--fonte-titulo);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--azul-escuro);
+  cursor: pointer;
+}
+
+.form-treino {
+  padding-bottom: 1.25rem;
+}
+
+.campo-dupla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ---------- Lista de treinos ---------- */
+
+.lista-treinos {
+  display: grid;
+  gap: 1rem;
+}
+
+.treino {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+}
+
+.treino-dia {
+  font-family: var(--fonte-titulo);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.treino-horario {
+  font-family: var(--fonte-titulo);
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--azul);
+}
+
+.treino-local {
+  font-weight: 600;
+}
+
+.treino-tipo,
+.treino-obs {
+  margin-top: 0.15rem;
+  color: var(--texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.treino-presenca {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+}
+
+.botao-vou {
+  padding: 0.55rem 1.3rem;
+  font-family: var(--fonte-texto);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--azul);
+  background: var(--branco);
+  border: 2px solid var(--azul);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
+}
+
+.botao-vou:hover {
+  background: var(--azul-claro);
+}
+
+.botao-vou:active {
+  transform: translateY(1px);
+}
+
+.botao-vou[aria-pressed="true"] {
+  color: var(--branco);
+  background: var(--azul);
+}
+
+.botao-vou:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.treino-contagem {
+  font-weight: 600;
+}
+
+.treino-nomes {
+  font-size: 0.95rem;
+  color: var(--texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.treino-acoes {
+  display: flex;
+  gap: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--linha);
+}
+
+.botao-texto {
+  padding: 0;
+  font-family: var(--fonte-texto);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--azul);
+  background: none;
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.botao-texto-perigo {
+  color: var(--erro);
+}
+
+/* ---------- Integrantes ---------- */
+
+.lista-integrantes {
+  display: grid;
+  gap: 0.25rem 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.integrante {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+.integrante-nome {
+  font-weight: 600;
+}
+
+.integrante-etiqueta {
+  padding: 0.1rem 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: 999px;
+}
+
+.integrante-lider {
+  color: var(--branco);
+  background: var(--azul);
+  border-color: var(--azul);
+}
+
+@media (min-width: 760px) {
+  .equipe-capa {
+    min-height: 260px;
+  }
+
+  .treino {
+    grid-template-columns: 200px 1fr 220px;
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  .treino-acoes {
+    grid-column: 1 / -1;
+  }
+
+  .lista-integrantes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao-vou {
+    transition: none;
+  }
+}
