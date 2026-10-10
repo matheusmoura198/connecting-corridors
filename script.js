@@ -110,7 +110,7 @@ formCriar.addEventListener("submit", async function (evento) {
   msgCriar.textContent = ""
   ocupado(botao, true, "Criar conta")
 
-  // 1. O nome de usuário está livre?
+  // O nome de usuário está livre?
   const disponivel = await cliente.rpc("nome_disponivel", { n: nome })
   if (disponivel.error) {
     msgCriar.textContent = mensagemDeErro(disponivel.error)
@@ -123,7 +123,7 @@ formCriar.addEventListener("submit", async function (evento) {
     return
   }
 
-  // 2. Cria a conta (o perfil é criado sozinho pelo banco de dados)
+  // Cria a conta,o perfil vai ser criado sozinho pelo banco de dados
   const resposta = await cliente.auth.signUp({
     email: email,
     password: senha,
@@ -139,7 +139,7 @@ formCriar.addEventListener("submit", async function (evento) {
 
   formCriar.reset()
 
-  // Se o Supabase pede confirmação por email, ainda não há sessão
+  // Enquanto o Supabase pedir confirmação por email, não haverá sessão
   if (!resposta.data.session) {
     trocarAba("entrar")
     msgEntrar.classList.add("ok")
@@ -194,7 +194,7 @@ botaoSair.addEventListener("click", async function () {
 
 // ---------- Escolha da equipe ----------
 
-// Cria um quadro clicável para cada equipe que existe na tabela "equipes"
+// Isso vai criar um quadro clicável para cada equipe que existe na tabela "equipes"
 function desenharEquipes() {
   gradeEquipes.innerHTML = ""
 
@@ -307,5 +307,5 @@ formSugestao.addEventListener("submit", async function (evento) {
 })
 
 
-// ---------- Começo: decide qual tela mostrar ----------
+// ---------- decide qual tela mostrar dependendo de condições anteriores----------
 mostrarTela()
