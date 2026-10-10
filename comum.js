@@ -22,12 +22,20 @@ let perfil = null
 
 
 // ---------- As equipes ----------
-// O "slug" é o nome curto que vai no endereço da página (equipe.html?equipe=vai-na-fe)
-// e também no nome da foto (img/equipe-vai-na-fe.jpg).
-const EQUIPES = [
-  { slug: "vai-na-fe", nome: "Equipe vai na fé" },
-  { slug: "comedores-de-km", nome: "Equipe comedores de km" }
-]
+// As equipes ficam na tabela "equipes" do Supabase (slug, nome e foto).
+// Para criar uma equipe nova, basta adicionar uma linha lá.
+// O "slug" é o nome curto que vai no endereço da página
+// (equipe.html?equipe=vai-na-fe).
+let EQUIPES = []
+
+async function carregarEquipes() {
+  const resposta = await cliente
+    .from("equipes")
+    .select("slug, nome, foto")
+    .order("criado_em", { ascending: true })
+
+  EQUIPES = resposta.error ? [] : resposta.data
+}
 
 function equipePorSlug(slug) {
   return EQUIPES.find(function (equipe) {
