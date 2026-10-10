@@ -19,7 +19,7 @@
   <!-- =========================================================
        TELA 1: LOGIN / CADASTRO
        ========================================================= -->
-  <main id="tela-login" class="tela-login">
+  <main id="tela-login" class="tela-login" hidden>
     <div class="login-caixa">
       <img class="login-logo" src="img/logo.png" alt="Logo do Conecting Corridors" width="120" height="120">
       <h1 class="login-titulo">Conecting Corridors</h1>
@@ -167,8 +167,8 @@
               </form>
 
               <div class="caixa-midia">
-                <h3>Fotos e vídeos</h3>
-                <p>O envio de fotos e vídeos chega na próxima etapa do site.</p>
+                <h3>Fotos</h3>
+                <p>O envio de fotos chega na próxima etapa do site.</p>
               </div>
             </div>
 
@@ -207,6 +207,9 @@
 
   </div>
 
+  <!-- Biblioteca do Supabase (única biblioteca externa do site) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
