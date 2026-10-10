@@ -1,8 +1,18 @@
-// ---------- Nomes das "gavetas" onde guardamos os dados ----------
-const CHAVE_USUARIOS = "cc_usuarios"
-const CHAVE_SESSAO = "cc_sessao"
-const CHAVE_COMENTARIOS = "cc_comentarios"
-const CHAVE_SUGESTOES = "cc_sugestoes"
+// ---------- Conexão com o Supabase ----------
+const configurado =
+  typeof SUPABASE_URL === "string" &&
+  typeof SUPABASE_ANON_KEY === "string" &&
+  !SUPABASE_URL.includes("COLE_AQUI") &&
+  !SUPABASE_ANON_KEY.includes("COLE_AQUI")
+
+let cliente = null
+if (configurado && window.supabase) {
+  cliente = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+}
+
+// Dados do usuário logado: { id, nome, equipe, papel }
+let perfil = null
+
 
 // ---------- Elementos da página ----------
 const telaLogin = document.getElementById("tela-login")
@@ -31,55 +41,98 @@ const sugestaoTexto = document.getElementById("sugestao-texto")
 const msgSugestao = document.getElementById("msg-sugestao")
 
 
-// ---------- Funções para ler e salvar listas ----------
-function lerLista(chave) {
-  try {
-    return JSON.parse(localStorage.getItem(chave)) || []
-  } catch (erro) {
-    return []
+// ---------- Funções de apoio ----------
+
+// Traduz os erros do Supabase para mensagens fáceis de entender
+function mensagemDeErro(erro) {
+  const texto = erro && erro.message ? erro.message : ""
+
+  if (texto.includes("Invalid login credentials")) {
+    return "Email ou senha incorretos."
   }
+  if (texto.includes("Email not confirmed")) {
+    return "Confirme seu email antes de entrar. Procure a mensagem na sua caixa de entrada."
+  }
+  if (texto.includes("already registered")) {
+    return "Já existe uma conta com esse email. Use a aba Entrar."
+  }
+  if (texto.includes("Database error saving new user")) {
+    return "Esse nome de usuário já está em uso. Escolha outro."
+  }
+  if (texto.includes("Password should be")) {
+    return "A senha precisa ter pelo menos 6 caracteres."
+  }
+  if (texto.includes("rate limit")) {
+    return "Muitas tentativas. Espere alguns minutos e tente de novo."
+  }
+  return "Algo deu errado. Confira sua internet e tente de novo."
 }
 
-function salvarLista(chave, lista) {
-  localStorage.setItem(chave, JSON.stringify(lista))
+// Deixa o botão "ocupado" enquanto espera o Supabase responder
+function ocupado(botao, estaOcupado, textoNormal) {
+  botao.disabled = estaOcupado
+  botao.textContent = estaOcupado ? "Aguarde..." : textoNormal
 }
 
-// Devolve o usuário que está logado (ou undefined se ninguém estiver)
-function usuarioAtual() {
-  const emailLogado = localStorage.getItem(CHAVE_SESSAO)
-  const usuarios = lerLista(CHAVE_USUARIOS)
-  return usuarios.find(function (usuario) {
-    return usuario.email === emailLogado
+function formatarData(valor) {
+  return new Date(valor).toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
   })
 }
 
-// Salva as mudanças feitas num usuário (por exemplo, a equipe escolhida)
-function atualizarUsuario(usuarioMudado) {
-  const usuarios = lerLista(CHAVE_USUARIOS)
-  const posicao = usuarios.findIndex(function (usuario) {
-    return usuario.email === usuarioMudado.email;
-  })
-  if (posicao !== -1) {
-    usuarios[posicao] = usuarioMudado
-    salvarLista(CHAVE_USUARIOS, usuarios)
+async function carregarPerfil(idUsuario) {
+  const resposta = await cliente
+    .from("profiles")
+    .select("id, nome, equipe, papel")
+    .eq("id", idUsuario)
+    .single()
+
+  if (resposta.error) {
+    return null
   }
+  return resposta.data
 }
 
 
 // ---------- Mostrar a tela certa ----------
-function mostrarTela() {
-  const usuario = usuarioAtual()
+function mostrarLogin() {
+  telaLogin.hidden = false
+  telaSite.hidden = true
+}
 
-  if (usuario) {
-    telaLogin.hidden = true
-    telaSite.hidden = false
-    nomeUsuario.textContent = usuario.nome
-    marcarEquipe(usuario.equipe)
-    mostrarComentarios(false)
-  } else {
-    telaLogin.hidden = false
-    telaSite.hidden = true
+async function mostrarTela() {
+  if (!cliente) {
+    const aviso =
+      "O site ainda não está conectado ao Supabase. Preencha o arquivo supabase-config.js."
+    msgEntrar.textContent = aviso
+    msgCriar.textContent = aviso
+    formEntrar.querySelector("button[type=submit]").disabled = true
+    formCriar.querySelector("button[type=submit]").disabled = true
+    mostrarLogin()
+    return
   }
+
+  const resposta = await cliente.auth.getSession()
+  const sessao = resposta.data.session
+
+  perfil = sessao ? await carregarPerfil(sessao.user.id) : null
+
+  if (!perfil) {
+    if (sessao) {
+      await cliente.auth.signOut()
+    }
+    mostrarLogin()
+    return
+  }
+
+  telaLogin.hidden = true
+  telaSite.hidden = false
+  nomeUsuario.textContent = perfil.nome
+  marcarEquipe(perfil.equipe)
+  await mostrarComentarios(false)
 }
 
 
@@ -87,10 +140,11 @@ function mostrarTela() {
 function trocarAba(aba) {
   const entrando = aba === "entrar"
 
-  formEntrar.hidden = !entrando;
-  formCriar.hidden = entrando;
+  formEntrar.hidden = !entrando
+  formCriar.hidden = entrando
   abaEntrar.setAttribute("aria-selected", String(entrando))
   abaCriar.setAttribute("aria-selected", String(!entrando))
+  msgEntrar.classList.remove("ok")
   msgEntrar.textContent = ""
   msgCriar.textContent = ""
 }
@@ -103,9 +157,13 @@ abaCriar.addEventListener("click", function () {
   trocarAba("criar")
 })
 
-formCriar.addEventListener("submit", function (evento) {
+formCriar.addEventListener("submit", async function (evento) {
   evento.preventDefault()
+  if (!cliente) {
+    return
+  }
 
+  const botao = formCriar.querySelector("button[type=submit]")
   const nome = document.getElementById("criar-nome").value.trim()
   const email = document.getElementById("criar-email").value.trim().toLowerCase()
   const senha = document.getElementById("criar-senha").value
@@ -123,203 +181,267 @@ formCriar.addEventListener("submit", function (evento) {
     return
   }
 
-  const usuarios = lerLista(CHAVE_USUARIOS)
+  msgCriar.textContent = ""
+  ocupado(botao, true, "Criar conta")
 
-  const emailJaExiste = usuarios.some(function (usuario) {
-    return usuario.email === email
-  })
-  if (emailJaExiste) {
-    msgCriar.textContent = "Já existe uma conta com esse email. Use a aba Entrar."
+  // 1. O nome de usuário está livre?
+  const disponivel = await cliente.rpc("nome_disponivel", { n: nome })
+  if (disponivel.error) {
+    msgCriar.textContent = mensagemDeErro(disponivel.error)
+    ocupado(botao, false, "Criar conta")
     return
   }
-
-  const nomeJaExiste = usuarios.some(function (usuario) {
-    return usuario.nome.toLowerCase() === nome.toLowerCase()
-  })
-  if (nomeJaExiste) {
+  if (disponivel.data === false) {
     msgCriar.textContent = "Esse nome de usuário já está em uso. Escolha outro."
+    ocupado(botao, false, "Criar conta")
     return
   }
 
-  usuarios.push({ nome: nome, email: email, senha: senha, equipe: "" })
-  salvarLista(CHAVE_USUARIOS, usuarios)
+  // 2. Cria a conta (o perfil é criado sozinho pelo banco de dados)
+  const resposta = await cliente.auth.signUp({
+    email: email,
+    password: senha,
+    options: { data: { nome: nome } }
+  })
 
-  localStorage.setItem(CHAVE_SESSAO, email)
+  ocupado(botao, false, "Criar conta")
+
+  if (resposta.error) {
+    msgCriar.textContent = mensagemDeErro(resposta.error)
+    return
+  }
+
   formCriar.reset()
-  mostrarTela()
+
+  // Se o Supabase pede confirmação por email, ainda não há sessão
+  if (!resposta.data.session) {
+    trocarAba("entrar")
+    msgEntrar.classList.add("ok")
+    msgEntrar.textContent =
+      "Conta criada. Enviamos uma mensagem para o seu email: confirme e depois entre."
+    return
+  }
+
+  await mostrarTela()
   window.scrollTo(0, 0)
 })
 
-formEntrar.addEventListener("submit", function (evento) {
+formEntrar.addEventListener("submit", async function (evento) {
   evento.preventDefault()
+  if (!cliente) {
+    return
+  }
 
+  const botao = formEntrar.querySelector("button[type=submit]")
   const email = document.getElementById("entrar-email").value.trim().toLowerCase()
   const senha = document.getElementById("entrar-senha").value
 
-  const usuarios = lerLista(CHAVE_USUARIOS)
-  const usuario = usuarios.find(function (item) {
-    return item.email === email
+  msgEntrar.classList.remove("ok")
+  msgEntrar.textContent = ""
+  ocupado(botao, true, "Entrar")
+
+  const resposta = await cliente.auth.signInWithPassword({
+    email: email,
+    password: senha
   })
 
-  if (!usuario) {
-    msgEntrar.textContent = "Esse email ainda não tem conta. Use a aba Criar conta."
-    return
-  }
-  if (usuario.senha !== senha) {
-    msgEntrar.textContent = "Senha incorreta. Confira e tente de novo."
+  ocupado(botao, false, "Entrar")
+
+  if (resposta.error) {
+    msgEntrar.textContent = mensagemDeErro(resposta.error)
     return
   }
 
-  localStorage.setItem(CHAVE_SESSAO, email);
-  formEntrar.reset();
-  mostrarTela();
-  window.scrollTo(0, 0);
-});
+  formEntrar.reset()
+  await mostrarTela()
+  window.scrollTo(0, 0)
+})
 
-botaoSair.addEventListener("click", function () {
-  localStorage.removeItem(CHAVE_SESSAO);
-  trocarAba("entrar");
-  mostrarTela();
-  window.scrollTo(0, 0);
-});
+botaoSair.addEventListener("click", async function () {
+  await cliente.auth.signOut()
+  perfil = null
+  trocarAba("entrar")
+  mostrarLogin()
+  window.scrollTo(0, 0)
+})
 
 
 // ---------- Escolha da equipe ----------
 function marcarEquipe(equipeEscolhida) {
   equipeTiles.forEach(function (tile) {
-    const selecionada = tile.dataset.equipe === equipeEscolhida;
-    tile.classList.toggle("selecionada", selecionada);
-    tile.setAttribute("aria-pressed", String(selecionada));
-  });
+    const selecionada = tile.dataset.equipe === equipeEscolhida
+    tile.classList.toggle("selecionada", selecionada)
+    tile.setAttribute("aria-pressed", String(selecionada))
+  })
 
   if (equipeEscolhida) {
     avisoEquipe.textContent =
-      "Você escolheu a " + equipeEscolhida + ". A página da equipe, com treinos e integrantes, chega na próxima etapa.";
+      "Você escolheu a " + equipeEscolhida + ". A página da equipe, com treinos e integrantes, chega na próxima etapa."
   } else {
-    avisoEquipe.textContent = "";
+    avisoEquipe.textContent = ""
   }
 }
 
 equipeTiles.forEach(function (tile) {
-  tile.addEventListener("click", function () {
-    const usuario = usuarioAtual();
-    if (!usuario) {
-      return;
+  tile.addEventListener("click", async function () {
+    if (!perfil) {
+      return
     }
-    usuario.equipe = tile.dataset.equipe;
-    atualizarUsuario(usuario);
-    marcarEquipe(usuario.equipe);
-  });
-});
+
+    const novaEquipe = tile.dataset.equipe
+    const resposta = await cliente
+      .from("profiles")
+      .update({ equipe: novaEquipe })
+      .eq("id", perfil.id)
+
+    if (resposta.error) {
+      avisoEquipe.textContent = "Não foi possível salvar sua equipe. Tente de novo."
+      return
+    }
+
+    perfil.equipe = novaEquipe
+    marcarEquipe(novaEquipe)
+  })
+})
 
 // Se a foto da equipe ainda não existir, esconde a imagem quebrada
 // e deixa aparecer o fundo azul com o nome da equipe.
 document.querySelectorAll(".equipe-tile img").forEach(function (imagem) {
   function esconderImagem() {
-    imagem.hidden = true;
+    imagem.hidden = true
   }
-  imagem.addEventListener("error", esconderImagem);
+  imagem.addEventListener("error", esconderImagem)
   if (imagem.complete && imagem.naturalWidth === 0) {
-    esconderImagem();
+    esconderImagem()
   }
-});
+})
 
 
 // ---------- Comentários da comunidade ----------
-function formatarData(milissegundos) {
-  return new Date(milissegundos).toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
 
 // Desenha a lista de comentários. Se "destacarPrimeiro" for true,
 // o comentário mais recente aparece com uma pequena animação.
-function mostrarComentarios(destacarPrimeiro) {
-  const comentarios = lerLista(CHAVE_COMENTARIOS);
-  listaComentarios.innerHTML = "";
-  semComentarios.hidden = comentarios.length > 0;
+async function mostrarComentarios(destacarPrimeiro) {
+  const resposta = await cliente
+    .from("comentarios")
+    .select("id, texto, criado_em, user_id, profiles(nome)")
+    .order("criado_em", { ascending: false })
+    .limit(50)
 
-  // O mais novo fica no topo
-  comentarios
-    .slice()
-    .reverse()
-    .forEach(function (comentario, posicao) {
-      const caixa = document.createElement("article");
-      caixa.className = "comentario";
-      if (destacarPrimeiro && posicao === 0) {
-        caixa.classList.add("novo");
-      }
+  listaComentarios.innerHTML = ""
 
-      const topo = document.createElement("div");
-      topo.className = "comentario-topo";
-
-      const nome = document.createElement("span");
-      nome.className = "comentario-nome";
-      nome.textContent = comentario.nome;
-
-      const data = document.createElement("span");
-      data.className = "comentario-data";
-      data.textContent = formatarData(comentario.data);
-
-      const texto = document.createElement("p");
-      texto.className = "comentario-texto";
-      texto.textContent = comentario.texto;
-
-      topo.appendChild(nome);
-      topo.appendChild(data);
-      caixa.appendChild(topo);
-      caixa.appendChild(texto);
-      listaComentarios.appendChild(caixa);
-    });
-}
-
-formComentario.addEventListener("submit", function (evento) {
-  evento.preventDefault();
-
-  const usuario = usuarioAtual();
-  const texto = comentarioTexto.value.trim();
-  if (!usuario || texto === "") {
-    return;
+  if (resposta.error) {
+    semComentarios.textContent = "Não foi possível carregar os comentários agora."
+    semComentarios.hidden = false
+    return
   }
 
-  const comentarios = lerLista(CHAVE_COMENTARIOS);
-  comentarios.push({ nome: usuario.nome, texto: texto, data: Date.now() });
-  salvarLista(CHAVE_COMENTARIOS, comentarios);
+  semComentarios.textContent = "Ainda não há comentários. Escreva o primeiro."
+  semComentarios.hidden = resposta.data.length > 0
 
-  comentarioTexto.value = "";
-  mostrarComentarios(true);
-});
+  resposta.data.forEach(function (comentario, posicao) {
+    const caixa = document.createElement("article")
+    caixa.className = "comentario"
+    if (destacarPrimeiro && posicao === 0) {
+      caixa.classList.add("novo")
+    }
+
+    const topo = document.createElement("div")
+    topo.className = "comentario-topo"
+
+    const nome = document.createElement("span")
+    nome.className = "comentario-nome"
+    nome.textContent = comentario.profiles ? comentario.profiles.nome : "Usuário"
+
+    const data = document.createElement("span")
+    data.className = "comentario-data"
+    data.textContent = formatarData(comentario.criado_em)
+
+    topo.appendChild(nome)
+    topo.appendChild(data)
+
+    // Só quem escreveu (ou o admin) vê o botão de apagar
+    if (perfil && (perfil.id === comentario.user_id || perfil.papel === "admin")) {
+      const apagar = document.createElement("button")
+      apagar.type = "button"
+      apagar.className = "comentario-apagar"
+      apagar.textContent = "Apagar"
+      apagar.addEventListener("click", async function () {
+        if (!window.confirm("Apagar este comentário?")) {
+          return
+        }
+        await cliente.from("comentarios").delete().eq("id", comentario.id)
+        await mostrarComentarios(false)
+      })
+      topo.appendChild(apagar)
+    }
+
+    const texto = document.createElement("p")
+    texto.className = "comentario-texto"
+    texto.textContent = comentario.texto
+
+    caixa.appendChild(topo)
+    caixa.appendChild(texto)
+    listaComentarios.appendChild(caixa)
+  })
+}
+
+formComentario.addEventListener("submit", async function (evento) {
+  evento.preventDefault()
+
+  const texto = comentarioTexto.value.trim()
+  if (!perfil || texto === "") {
+    return
+  }
+
+  const botao = formComentario.querySelector("button[type=submit]")
+  ocupado(botao, true, "Publicar comentário")
+
+  const resposta = await cliente.from("comentarios").insert({ texto: texto })
+
+  ocupado(botao, false, "Publicar comentário")
+
+  if (resposta.error) {
+    window.alert("Não foi possível publicar o comentário. Tente de novo.")
+    return
+  }
+
+  comentarioTexto.value = ""
+  await mostrarComentarios(true)
+})
 
 
 // ---------- Sugestões ----------
-formSugestao.addEventListener("submit", function (evento) {
-  evento.preventDefault();
+formSugestao.addEventListener("submit", async function (evento) {
+  evento.preventDefault()
 
-  const usuario = usuarioAtual();
-  const texto = sugestaoTexto.value.trim();
+  const texto = sugestaoTexto.value.trim()
+  msgSugestao.classList.remove("ok")
 
   if (texto === "") {
-    msgSugestao.classList.remove("ok");
-    msgSugestao.textContent = "Escreva sua sugestão antes de enviar.";
-    return;
+    msgSugestao.textContent = "Escreva sua sugestão antes de enviar."
+    return
+  }
+  if (!perfil) {
+    return
   }
 
-  const sugestoes = lerLista(CHAVE_SUGESTOES);
-  sugestoes.push({
-    nome: usuario ? usuario.nome : "",
-    email: usuario ? usuario.email : "",
-    texto: texto,
-    data: Date.now()
-  });
-  salvarLista(CHAVE_SUGESTOES, sugestoes);
+  const botao = formSugestao.querySelector("button[type=submit]")
+  ocupado(botao, true, "Enviar sugestão")
 
-  sugestaoTexto.value = "";
-  msgSugestao.classList.add("ok");
-  msgSugestao.textContent = "Sugestão enviada. Obrigado por ajudar a melhorar o site.";
-});
+  const resposta = await cliente.from("sugestoes").insert({ texto: texto })
+
+  ocupado(botao, false, "Enviar sugestão")
+
+  if (resposta.error) {
+    msgSugestao.textContent = "Não foi possível enviar agora. Tente de novo."
+    return
+  }
+
+  sugestaoTexto.value = ""
+  msgSugestao.classList.add("ok")
+  msgSugestao.textContent = "Sugestão enviada. Obrigado por ajudar a melhorar o site."
+})
 
 
 // ---------- Começo: decide qual tela mostrar ----------
