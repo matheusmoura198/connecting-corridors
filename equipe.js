@@ -77,6 +77,7 @@ async function iniciar() {
   perfil = await obterPerfilLogado()
 
   if (!perfil) {
+    guardarDestino(window.location.href)
     window.location.href = "index.html"
     return
   }
@@ -149,6 +150,39 @@ botaoEntrarEquipe.addEventListener("click", async function () {
 
   window.location.reload()
 })
+
+
+// ---------- Compartilhar o treino no WhatsApp ----------
+
+// Monta a mensagem que vai pronta para o WhatsApp
+function montarMensagemDoTreino(treino) {
+  const endereco = new URL("equipe.html?equipe=" + equipe.slug, window.location.href).href
+
+  const linhas = [
+    "🏃 Treino da " + equipe.nome,
+    "📅 " + formatarDiaDoTreino(treino.dia) + " às " + formatarHorario(treino.horario),
+    "📍 Saída: " + treino.local_saida
+  ]
+  if (treino.tipo) {
+    linhas.push(treino.tipo)
+  }
+  if (treino.observacao) {
+    linhas.push("Obs: " + treino.observacao)
+  }
+  linhas.push("")
+  linhas.push("Confirme sua presença no site:")
+  linhas.push(endereco)
+
+  return linhas.join("\n")
+}
+
+function criarLinkDoWhatsApp(treino) {
+  const link = criarElemento("a", "botao-whatsapp", "Compartilhar no WhatsApp")
+  link.href = "https://wa.me/?text=" + encodeURIComponent(montarMensagemDoTreino(treino))
+  link.target = "_blank"
+  link.rel = "noopener"
+  return link
+}
 
 
 // ---------- Treinos ----------
@@ -235,6 +269,7 @@ function criarCartaoDeTreino(treino) {
     })
     presenca.appendChild(criarElemento("p", "treino-nomes", nomes.join(", ")))
   }
+  presenca.appendChild(criarLinkDoWhatsApp(treino))
   cartao.appendChild(presenca)
 
   // Botões do líder
