@@ -1353,3 +1353,124 @@ a {
   margin-top: 0.5rem;
   color: var(--texto-suave);
 }
+
+/* =========================================================
+   COMPARTILHAR NO WHATSAPP E COMENTÁRIOS NAS POSTAGENS
+   ========================================================= */
+
+.botao-whatsapp {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sucesso);
+  text-decoration: none;
+  background: var(--branco);
+  border: 2px solid var(--sucesso);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.botao-whatsapp:hover {
+  background: #e3f3ea;
+}
+
+.post-rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.botao-comentarios {
+  padding: 0.35rem 0.8rem;
+  font-family: var(--fonte-texto);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  background: var(--branco);
+  border: 1.5px solid var(--linha);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.botao-comentarios:hover {
+  color: var(--azul);
+  border-color: var(--azul);
+}
+
+.botao-comentarios[aria-expanded="true"] {
+  color: var(--azul);
+  background: var(--azul-claro);
+  border-color: var(--azul);
+}
+
+.post-comentarios {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  background: var(--azul-claro);
+  border-radius: 10px;
+}
+
+.comentarios-lista {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.pcomentario-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+
+.pcomentario-nome {
+  font-weight: 600;
+}
+
+.pcomentario-apagar {
+  margin-left: auto;
+}
+
+.pcomentario-texto {
+  margin-top: 0.15rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.form-comentario {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.form-comentario input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--fonte-texto);
+  font-size: 1rem;
+  color: var(--preto);
+  background: var(--branco);
+  border: 1.5px solid var(--linha);
+  border-radius: 10px;
+}
+
+.form-comentario input:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(10, 85, 219, 0.25);
+}
+
+.botao-pequeno {
+  padding: 0.6rem 1.1rem;
+  font-size: 0.95rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botao-whatsapp,
+  .botao-comentarios {
+    transition: none;
+  }
+}
