@@ -219,6 +219,7 @@ async function mostrarPosts(destacarPrimeiro) {
   listaPosts.innerHTML = ""
 
   if (resposta.error) {
+    console.error("Erro ao carregar posts:", resposta.error)
     semPosts.textContent = "Não foi possível carregar as postagens agora."
     semPosts.hidden = false
     botaoMaisPosts.hidden = true
