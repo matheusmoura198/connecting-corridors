@@ -122,7 +122,7 @@ async function mostrarDuvidas(destacarPrimeira) {
   let consulta = cliente
     .from("duvidas")
     .select(
-      "id, user_id, equipe, titulo, detalhe, resolvida, criado_em, profiles(nome), respostas(id, user_id, texto, criado_em, profiles(nome))"
+      "id, user_id, equipe, titulo, detalhe, resolvida, criado_em, profiles!duvidas_user_id_fkey(nome), respostas(id, user_id, texto, criado_em, profiles(nome))"
     )
     .eq("resolvida", verResolvidas)
 
