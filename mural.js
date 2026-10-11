@@ -204,7 +204,7 @@ formPost.addEventListener("submit", async function (evento) {
 async function mostrarPosts(destacarPrimeiro) {
   let consulta = cliente
     .from("posts")
-    .select("id, user_id, equipe, texto, foto_caminho, criado_em, profiles(nome), curtidas(user_id)")
+    .select("id, user_id, equipe, texto, foto_caminho, criado_em, profiles!posts_user_id_fkey(nome), curtidas(user_id)")
 
   if (equipeDoMural === null) {
     consulta = consulta.is("equipe", null)
