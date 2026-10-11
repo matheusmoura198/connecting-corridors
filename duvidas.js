@@ -139,6 +139,7 @@ async function mostrarDuvidas(destacarPrimeira) {
   listaDuvidas.innerHTML = ""
 
   if (resposta.error) {
+    console.error("Erro ao carregar posts:", resposta.error)
     semDuvidas.textContent = "Não foi possível carregar as dúvidas agora."
     semDuvidas.hidden = false
     botaoMaisDuvidas.hidden = true
