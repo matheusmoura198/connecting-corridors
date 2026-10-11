@@ -2,7 +2,7 @@ const PASTA_FOTOS = "fotos"
 const POSTS_POR_VEZ = 20
 const TAMANHO_MAXIMO_DA_FOTO = 1500000
 
-// Coração
+// Coração (texto fixo, sem dados de usuário). O CSS pinta o contorno ou o preenchimento.
 const ICONE_CORACAO =
   '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' +
   '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>' +
@@ -12,7 +12,7 @@ const ICONE_CORACAO =
 let equipeDoMural = null
 let limiteDePosts = POSTS_POR_VEZ
 
-// Foto já reduzida pronta para enviar
+// Foto já reduzida (Blob), pronta para enviar
 let fotoEscolhida = null
 let enderecoDaPrevia = null
 
@@ -67,7 +67,9 @@ function carregarImagem(arquivo) {
   })
 }
 
-// Reduz a foto no próprio navegador antes de enviar.
+// Reduz a foto no próprio navegador antes de enviar (celular tira fotos
+// de vários MB, e o espaço grátis do Supabase é limitado).
+// Devolve um Blob JPEG, ou null se não conseguir.
 async function comprimirFoto(arquivo) {
   let imagem
   try {
@@ -163,7 +165,7 @@ formPost.addEventListener("submit", async function (evento) {
   msgPost.textContent = ""
   ocupado(botaoPublicar, true, "Publicar")
 
-  //Envia a foto.E Fica na pasta com o id de quem enviou.
+  // 1. Envia a foto (se houver). Fica na pasta com o id de quem enviou.
   let caminho = null
   if (fotoEscolhida) {
     caminho = perfil.id + "/" + nomeUnico() + ".jpg"
@@ -178,7 +180,7 @@ formPost.addEventListener("submit", async function (evento) {
     }
   }
 
-  //Cria a postagem
+  // 2. Cria a postagem
   const resposta = await cliente
     .from("posts")
     .insert({ equipe: equipeDoMural, texto: texto, foto_caminho: caminho })
@@ -202,9 +204,14 @@ formPost.addEventListener("submit", async function (evento) {
 
 // ---------- Lista de postagens ----------
 async function mostrarPosts(destacarPrimeiro) {
+  // Atenção: "profiles!posts_user_id_fkey(nome)" diz ao Supabase qual ligação usar
+  // para buscar o nome de quem postou. Sem isso, ele encontra dois caminhos entre
+  // postagens e perfis (direto e pelas curtidas) e se recusa a carregar as postagens.
   let consulta = cliente
     .from("posts")
-    .select("id, user_id, equipe, texto, foto_caminho, criado_em, profiles!posts_user_id_fkey(nome), curtidas(user_id)")
+    .select(
+      "id, user_id, equipe, texto, foto_caminho, criado_em, profiles!posts_user_id_fkey(nome), curtidas(user_id), post_comentarios(id, user_id, texto, criado_em, profiles(nome))"
+    )
 
   if (equipeDoMural === null) {
     consulta = consulta.is("equipe", null)
@@ -219,7 +226,7 @@ async function mostrarPosts(destacarPrimeiro) {
   listaPosts.innerHTML = ""
 
   if (resposta.error) {
-    console.error("Erro ao carregar posts:", resposta.error)
+    console.error("Erro ao carregar as postagens:", resposta.error)
     semPosts.textContent = "Não foi possível carregar as postagens agora."
     semPosts.hidden = false
     botaoMaisPosts.hidden = true
@@ -257,7 +264,7 @@ function podeApagarPost(post) {
 function criarCartaoDePost(post) {
   const cartao = criarElemento("article", "post")
 
-  // nome, data e botão de apagar
+  // Topo: nome, data e botão de apagar
   const topo = criarElemento("div", "post-topo")
   topo.appendChild(criarElemento("span", "post-nome", post.profiles ? post.profiles.nome : "Usuário"))
   topo.appendChild(criarElemento("span", "post-data", formatarData(post.criado_em)))
@@ -277,7 +284,7 @@ function criarCartaoDePost(post) {
     cartao.appendChild(criarElemento("p", "post-texto-conteudo", post.texto))
   }
 
-  // Foto,se clicar vai abrir a foto inteira em outra aba
+  // Foto (clicar abre a foto inteira em outra aba)
   if (post.foto_caminho) {
     const link = criarElemento("a", "post-foto-link")
     link.href = enderecoDaFoto(post.foto_caminho)
@@ -293,7 +300,14 @@ function criarCartaoDePost(post) {
     cartao.appendChild(link)
   }
 
-  cartao.appendChild(criarBotaoCurtir(post))
+  // Rodapé: curtir e comentar
+  const comentarios = criarAreaDeComentarios(post)
+  const rodape = criarElemento("div", "post-rodape")
+  rodape.appendChild(criarBotaoCurtir(post))
+  rodape.appendChild(comentarios.botao)
+  cartao.appendChild(rodape)
+  cartao.appendChild(comentarios.area)
+
   return cartao
 }
 
@@ -302,7 +316,7 @@ async function apagarPost(post) {
     return
   }
 
-  // Primeiro a foto, depois a postagem,só é permitido se a foto existir
+  // Primeiro a foto, depois a postagem (a permissão da foto depende da postagem existir)
   if (post.foto_caminho) {
     await cliente.storage.from(PASTA_FOTOS).remove([post.foto_caminho])
   }
@@ -377,4 +391,156 @@ function criarBotaoCurtir(post) {
   })
 
   return botao
+}
+
+
+// ---------- Comentários nas postagens ----------
+
+// Na Comunidade todo mundo comenta. No mural, só quem é da equipe (ou o admin).
+function podeComentar(post) {
+  return post.equipe === null || perfil.equipe === post.equipe || perfil.papel === "admin"
+}
+
+// Devolve o botão "Comentários" e a área que ele abre (lista + formulário).
+// Cada postagem cuida dos próprios comentários, sem recarregar o mural inteiro.
+function criarAreaDeComentarios(post) {
+  let comentarios = (post.post_comentarios || []).slice()
+
+  const botao = criarElemento("button", "botao-comentarios")
+  botao.type = "button"
+  botao.setAttribute("aria-expanded", "false")
+
+  const area = criarElemento("div", "post-comentarios")
+  area.hidden = true
+
+  const lista = criarElemento("div", "comentarios-lista")
+  area.appendChild(lista)
+
+  function atualizarBotao() {
+    if (comentarios.length === 0) {
+      botao.textContent = "Comentar"
+    } else if (comentarios.length === 1) {
+      botao.textContent = "1 comentário"
+    } else {
+      botao.textContent = comentarios.length + " comentários"
+    }
+  }
+
+  // Quem escreveu, quem fez a postagem, o líder da equipe e o admin podem apagar
+  function podeApagarComentario(comentario) {
+    return perfil.id === comentario.user_id || podeApagarPost(post)
+  }
+
+  function criarComentario(comentario) {
+    const caixa = criarElemento("div", "pcomentario")
+
+    const topo = criarElemento("div", "pcomentario-topo")
+    topo.appendChild(criarElemento("span", "pcomentario-nome", comentario.profiles ? comentario.profiles.nome : "Usuário"))
+    topo.appendChild(criarElemento("span", "post-data", formatarData(comentario.criado_em)))
+
+    if (podeApagarComentario(comentario)) {
+      const apagar = criarElemento("button", "botao-texto botao-texto-perigo pcomentario-apagar", "Apagar")
+      apagar.type = "button"
+      apagar.addEventListener("click", async function () {
+        if (!window.confirm("Apagar este comentário?")) {
+          return
+        }
+        const resultado = await cliente.from("post_comentarios").delete().eq("id", comentario.id)
+        if (resultado.error) {
+          window.alert("Não foi possível apagar o comentário. Tente de novo.")
+          return
+        }
+        await recarregar()
+      })
+      topo.appendChild(apagar)
+    }
+
+    caixa.appendChild(topo)
+    caixa.appendChild(criarElemento("p", "pcomentario-texto", comentario.texto))
+    return caixa
+  }
+
+  function desenharLista() {
+    lista.innerHTML = ""
+    comentarios.sort(function (a, b) {
+      return new Date(a.criado_em) - new Date(b.criado_em)
+    })
+    comentarios.forEach(function (comentario) {
+      lista.appendChild(criarComentario(comentario))
+    })
+    lista.hidden = comentarios.length === 0
+    atualizarBotao()
+  }
+
+  async function recarregar() {
+    const resposta = await cliente
+      .from("post_comentarios")
+      .select("id, user_id, texto, criado_em, profiles(nome)")
+      .eq("post_id", post.id)
+      .order("criado_em", { ascending: true })
+
+    if (!resposta.error) {
+      comentarios = resposta.data
+      desenharLista()
+    }
+  }
+
+  // Formulário (ou o aviso, para quem só pode ler)
+  if (podeComentar(post)) {
+    const formulario = criarElemento("form", "form-comentario")
+    formulario.noValidate = true
+
+    const campo = criarElemento("input")
+    campo.type = "text"
+    campo.maxLength = 300
+    campo.placeholder = "Escreva um comentário"
+    campo.setAttribute("aria-label", "Escreva um comentário")
+
+    const enviar = criarElemento("button", "botao botao-pequeno", "Enviar")
+    enviar.type = "submit"
+
+    formulario.appendChild(campo)
+    formulario.appendChild(enviar)
+    area.appendChild(formulario)
+
+    formulario.addEventListener("submit", async function (evento) {
+      evento.preventDefault()
+
+      const texto = campo.value.trim()
+      if (texto === "") {
+        return
+      }
+
+      ocupado(enviar, true, "Enviar")
+      const resultado = await cliente
+        .from("post_comentarios")
+        .insert({ post_id: post.id, texto: texto })
+      ocupado(enviar, false, "Enviar")
+
+      if (resultado.error) {
+        window.alert("Não foi possível enviar o comentário. Tente de novo.")
+        return
+      }
+
+      campo.value = ""
+      await recarregar()
+      campo.focus()
+    })
+  } else {
+    area.appendChild(criarElemento("p", "vazio", "Só integrantes desta equipe comentam. Você pode ler e curtir."))
+  }
+
+  botao.addEventListener("click", function () {
+    const abrir = area.hidden
+    area.hidden = !abrir
+    botao.setAttribute("aria-expanded", String(abrir))
+
+    const campo = area.querySelector("input")
+    if (abrir && campo) {
+      campo.focus()
+    }
+  })
+
+  desenharLista()
+  return { botao: botao, area: area }
 }
