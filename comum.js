@@ -15,6 +15,10 @@ let perfil = null
 
 
 // ---------- As equipes ----------
+// As equipes ficam na tabela "equipes" do Supabase (slug, nome e foto).
+// Para criar uma equipe nova, basta adicionar uma linha lá.
+// O "slug" é o nome curto que vai no endereço da página
+// (equipe.html?equipe=vai-na-fe).
 let EQUIPES = []
 
 async function carregarEquipes() {
@@ -34,7 +38,8 @@ function equipePorSlug(slug) {
 
 
 // ---------- Funções de apoio ----------
-// Isso vai traduzir os erros do Supabase para mensagens fáceis de entender
+
+// Traduz os erros do Supabase para mensagens fáceis de entender
 function mensagemDeErro(erro) {
   const texto = erro && erro.message ? erro.message : ""
 
@@ -101,6 +106,7 @@ async function obterPerfilLogado() {
   return await carregarPerfil(sessao.user.id)
 }
 
+// Cria um elemento HTML já com classe e texto (o texto entra como texto, nunca como HTML)
 function criarElemento(tag, classe, texto) {
   const elemento = document.createElement(tag)
   if (classe) {
@@ -110,4 +116,28 @@ function criarElemento(tag, classe, texto) {
     elemento.textContent = texto
   }
   return elemento
+}
+
+// Lembra a página que a pessoa queria abrir antes de fazer login
+// (por exemplo, o link de um treino que veio pelo WhatsApp).
+function guardarDestino(endereco) {
+  try {
+    sessionStorage.setItem("voltar_para", endereco)
+  } catch (erro) {
+    // Se o navegador não deixar guardar, a pessoa só cai na página inicial
+  }
+}
+
+// Devolve o endereço guardado (e esquece dele). Só aceita endereços deste mesmo site.
+function pegarDestino() {
+  try {
+    const endereco = sessionStorage.getItem("voltar_para")
+    sessionStorage.removeItem("voltar_para")
+    if (endereco && new URL(endereco).origin === window.location.origin) {
+      return endereco
+    }
+  } catch (erro) {
+    return null
+  }
+  return null
 }
