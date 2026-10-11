@@ -52,6 +52,14 @@ async function mostrarTela() {
     return
   }
 
+  // Se a pessoa chegou por um link (ex.: treino compartilhado no WhatsApp),
+  // depois do login ela volta para a página do link.
+  const destino = pegarDestino()
+  if (destino) {
+    window.location.href = destino
+    return
+  }
+
   telaLogin.hidden = true
   telaSite.hidden = false
   nomeUsuario.textContent = perfil.nome
