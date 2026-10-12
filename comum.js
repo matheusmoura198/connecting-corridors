@@ -22,10 +22,19 @@ let perfil = null
 let EQUIPES = []
 
 async function carregarEquipes() {
-  const resposta = await cliente
+  let resposta = await cliente
     .from("equipes")
-    .select("slug, nome, foto")
+    .select("slug, nome, foto, aviso, aviso_em")
     .order("criado_em", { ascending: true })
+
+  // Se as colunas do aviso ainda não existem no banco (o SQL do aviso ainda não
+  // foi rodado), carrega as equipes sem elas para o site continuar funcionando.
+  if (resposta.error) {
+    resposta = await cliente
+      .from("equipes")
+      .select("slug, nome, foto")
+      .order("criado_em", { ascending: true })
+  }
 
   EQUIPES = resposta.error ? [] : resposta.data
 }
@@ -140,4 +149,31 @@ function pegarDestino() {
     return null
   }
   return null
+}
+
+// ---------- Datas e horários dos treinos ----------
+
+// Data de hoje no formato do banco: 2026-10-11
+function dataDeHoje() {
+  const agora = new Date()
+  const mes = String(agora.getMonth() + 1).padStart(2, "0")
+  const dia = String(agora.getDate()).padStart(2, "0")
+  return agora.getFullYear() + "-" + mes + "-" + dia
+}
+
+// Transforma 2026-10-11 em "Domingo, 11/10"
+function formatarDiaDoTreino(diaTexto) {
+  const partes = diaTexto.split("-")
+  const data = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]))
+  const texto = data.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit"
+  })
+  return texto.charAt(0).toUpperCase() + texto.slice(1)
+}
+
+// O banco devolve 05:30:00. Mostramos só 05:30
+function formatarHorario(horarioTexto) {
+  return horarioTexto.slice(0, 5)
 }
