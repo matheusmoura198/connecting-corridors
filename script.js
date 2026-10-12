@@ -12,6 +12,14 @@ const msgCriar = document.getElementById("msg-criar")
 const botaoSair = document.getElementById("botao-sair")
 const nomeUsuario = document.getElementById("nome-usuario")
 
+const botaoMinhaEquipe = document.getElementById("botao-minha-equipe")
+const painelTreinoConteudo = document.getElementById("painel-treino-conteudo")
+
+const avisoHome = document.getElementById("aviso-home")
+const avisoHomeTitulo = document.getElementById("aviso-home-titulo")
+const avisoHomeTexto = document.getElementById("aviso-home-texto")
+const avisoHomeLink = document.getElementById("aviso-home-link")
+
 const gradeEquipes = document.getElementById("equipes-grade")
 const avisoEquipe = document.getElementById("aviso-equipe")
 
@@ -66,6 +74,9 @@ async function mostrarTela() {
   await carregarEquipes()
   desenharEquipes()
   marcarEquipe(perfil.equipe)
+  mostrarAvisoNaHome()
+  atualizarBotaoMinhaEquipe()
+  mostrarProximoTreino()
   iniciarMural(null)
   iniciarDuvidas(null)
 }
@@ -83,6 +94,13 @@ function trocarAba(aba) {
   msgEntrar.textContent = ""
   msgCriar.textContent = ""
 }
+
+// Links da apresentação ("Criar minha conta", "Entrar") já abrem a aba certa
+document.querySelectorAll("[data-aba]").forEach(function (link) {
+  link.addEventListener("click", function () {
+    trocarAba(link.dataset.aba)
+  })
+})
 
 abaEntrar.addEventListener("click", function () {
   trocarAba("entrar")
@@ -203,6 +221,141 @@ botaoSair.addEventListener("click", async function () {
   mostrarLogin()
   window.scrollTo(0, 0)
 })
+
+
+// ---------- Próximo treino da equipe ----------
+
+function atualizarBotaoMinhaEquipe() {
+  const minhaEquipe = EQUIPES.find(function (equipe) {
+    return equipe.nome === perfil.equipe
+  })
+
+  if (minhaEquipe) {
+    botaoMinhaEquipe.textContent = "Abrir a página da minha equipe"
+    botaoMinhaEquipe.href = "equipe.html?equipe=" + minhaEquipe.slug
+  } else {
+    botaoMinhaEquipe.textContent = "Escolher minha equipe"
+    botaoMinhaEquipe.href = "#equipes"
+  }
+}
+
+// Mostra, logo na página inicial, o próximo treino da equipe da pessoa
+async function mostrarProximoTreino() {
+  painelTreinoConteudo.innerHTML = ""
+
+  const minhaEquipe = EQUIPES.find(function (equipe) {
+    return equipe.nome === perfil.equipe
+  })
+
+  if (!minhaEquipe) {
+    painelTreinoConteudo.appendChild(criarElemento("p", "vazio", "Escolha a sua equipe para ver os próximos treinos."))
+    return
+  }
+
+  const resposta = await cliente
+    .from("treinos")
+    .select("id, dia, horario, local_saida, tipo, observacao, presencas(user_id)")
+    .eq("equipe", minhaEquipe.nome)
+    .gte("dia", dataDeHoje())
+    .order("dia", { ascending: true })
+    .order("horario", { ascending: true })
+    .limit(1)
+
+  if (resposta.error) {
+    console.error("Erro ao carregar o próximo treino:", resposta.error)
+    painelTreinoConteudo.appendChild(criarElemento("p", "vazio", "Não foi possível carregar o próximo treino agora."))
+    return
+  }
+
+  if (resposta.data.length === 0) {
+    painelTreinoConteudo.appendChild(criarElemento("p", "vazio", "Sua equipe ainda não marcou o próximo treino."))
+    return
+  }
+
+  painelTreinoConteudo.appendChild(criarCartaoDoProximoTreino(resposta.data[0], minhaEquipe))
+}
+
+function criarCartaoDoProximoTreino(treino, minhaEquipe) {
+  const cartao = criarElemento("article", "treino")
+
+  const quando = criarElemento("div", "treino-quando")
+  quando.appendChild(criarElemento("p", "treino-dia", formatarDiaDoTreino(treino.dia)))
+  quando.appendChild(criarElemento("p", "treino-horario", formatarHorario(treino.horario)))
+  cartao.appendChild(quando)
+
+  const detalhes = criarElemento("div", "treino-detalhes")
+  detalhes.appendChild(criarElemento("p", "treino-local", "Saída: " + treino.local_saida))
+  if (treino.tipo) {
+    detalhes.appendChild(criarElemento("p", "treino-tipo", treino.tipo))
+  }
+  if (treino.observacao) {
+    detalhes.appendChild(criarElemento("p", "treino-obs", treino.observacao))
+  }
+  cartao.appendChild(detalhes)
+
+  // "Eu vou" direto da página inicial
+  const presencas = treino.presencas || []
+  const euVou = presencas.some(function (presenca) {
+    return presenca.user_id === perfil.id
+  })
+
+  const presenca = criarElemento("div", "treino-presenca")
+  const botaoVou = criarElemento("button", "botao-vou", euVou ? "Confirmado" : "Eu vou")
+  botaoVou.type = "button"
+  botaoVou.setAttribute("aria-pressed", String(euVou))
+  botaoVou.addEventListener("click", async function () {
+    botaoVou.disabled = true
+
+    let resultado
+    if (euVou) {
+      resultado = await cliente
+        .from("presencas")
+        .delete()
+        .eq("treino_id", treino.id)
+        .eq("user_id", perfil.id)
+    } else {
+      resultado = await cliente.from("presencas").insert({ treino_id: treino.id })
+    }
+
+    if (resultado.error) {
+      window.alert("Não foi possível salvar sua presença. Tente de novo.")
+    }
+    await mostrarProximoTreino()
+  })
+  presenca.appendChild(botaoVou)
+
+  const total = presencas.length === 1 ? "1 pessoa vai" : presencas.length + " pessoas vão"
+  presenca.appendChild(criarElemento("p", "treino-contagem", total))
+  cartao.appendChild(presenca)
+
+  const acoes = criarElemento("div", "treino-acoes")
+  const link = criarElemento("a", "botao-texto", "Abrir a página da equipe")
+  link.href = "equipe.html?equipe=" + minhaEquipe.slug + "#treinos"
+  acoes.appendChild(link)
+  cartao.appendChild(acoes)
+
+  return cartao
+}
+
+
+// ---------- Aviso do líder na página inicial ----------
+
+// Mostra, no topo, o aviso fixado pelo líder da equipe da própria pessoa
+function mostrarAvisoNaHome() {
+  const minhaEquipe = EQUIPES.find(function (equipe) {
+    return equipe.nome === perfil.equipe
+  })
+
+  if (!minhaEquipe || !minhaEquipe.aviso) {
+    avisoHome.hidden = true
+    return
+  }
+
+  avisoHomeTitulo.textContent = "Aviso do líder da " + minhaEquipe.nome
+  avisoHomeTexto.textContent = minhaEquipe.aviso
+  avisoHomeLink.href = "equipe.html?equipe=" + minhaEquipe.slug
+  avisoHome.hidden = false
+}
 
 
 // ---------- Escolha da equipe ----------
