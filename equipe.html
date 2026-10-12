@@ -54,6 +54,35 @@
           <p id="equipe-situacao" class="equipe-situacao"></p>
           <button type="button" id="botao-entrar-equipe" class="botao" hidden>Passar para esta equipe</button>
           <p id="msg-equipe" class="mensagem" role="alert"></p>
+
+          <!-- Aviso fixado pelo líder (aparece só se houver aviso) -->
+          <div id="aviso-fixado" class="aviso-fixado" hidden>
+            <p class="aviso-fixado-titulo">Aviso do líder</p>
+            <p id="aviso-fixado-texto" class="aviso-fixado-texto"></p>
+            <div class="aviso-fixado-rodape">
+              <span id="aviso-fixado-data" class="aviso-fixado-data"></span>
+              <span id="aviso-fixado-whatsapp"></span>
+            </div>
+          </div>
+
+          <!-- Só o líder da equipe (e o admin) vê esta parte -->
+          <details id="area-aviso" class="area-lider area-aviso" hidden>
+            <summary>Escrever aviso para a equipe</summary>
+
+            <form id="form-aviso" class="formulario form-treino" novalidate>
+              <div class="campo">
+                <label for="aviso-campo">Aviso (aparece no topo desta página e na página inicial dos integrantes)</label>
+                <textarea id="aviso-campo" rows="3" maxlength="500"></textarea>
+              </div>
+
+              <p id="msg-aviso" class="mensagem" role="alert"></p>
+
+              <div class="form-botoes">
+                <button type="submit" id="botao-publicar-aviso" class="botao">Publicar aviso</button>
+                <button type="button" id="botao-remover-aviso" class="botao-sair" hidden>Remover aviso</button>
+              </div>
+            </form>
+          </details>
         </div>
       </section>
 
@@ -107,6 +136,12 @@
 
           <div id="lista-treinos" class="lista-treinos"></div>
           <p id="sem-treinos" class="vazio">Nenhum treino marcado por enquanto.</p>
+
+          <!-- Os últimos treinos que já passaram -->
+          <details id="area-historico" class="historico" hidden>
+            <summary>Treinos anteriores</summary>
+            <div id="lista-historico" class="lista-historico"></div>
+          </details>
         </div>
       </section>
 
