@@ -32,56 +32,192 @@
   <!-- =========================================================
        TELA 1: LOGIN / CADASTRO
        ========================================================= -->
-  <main id="tela-login" class="tela-login" hidden>
-    <div class="login-caixa">
-      <img class="login-logo" src="img/logo.png" alt="Logo do Runners Conecting" width="120" height="120">
-      <h1 class="login-titulo">Runners Conecting</h1>
-      <p class="login-texto">Entre para acompanhar os treinos da sua equipe.</p>
+  <div id="tela-login" hidden>
 
-      <div class="abas" role="tablist" aria-label="Entrar ou criar conta">
-        <button type="button" id="aba-entrar" class="aba" role="tab" aria-selected="true" aria-controls="form-entrar">Entrar</button>
-        <button type="button" id="aba-criar" class="aba" role="tab" aria-selected="false" aria-controls="form-criar">Criar conta</button>
+    <header class="topo">
+      <div class="topo-conteudo">
+        <a class="marca" href="#topo-landing">
+          <img src="img/logo.png" alt="" width="36" height="36">
+          <span>Runners Conecting</span>
+        </a>
+        <a class="botao botao-pequeno" href="#acesso" data-aba="entrar">Entrar</a>
       </div>
+    </header>
 
-      <!-- Formulário: entrar -->
-      <form id="form-entrar" class="formulario" novalidate>
-        <div class="campo">
-          <label for="entrar-email">Email</label>
-          <input id="entrar-email" type="email" autocomplete="email" required>
-        </div>
-        <div class="campo">
-          <label for="entrar-senha">Senha</label>
-          <input id="entrar-senha" type="password" autocomplete="current-password" required>
-        </div>
-        <p id="msg-entrar" class="mensagem" role="alert"></p>
-        <button type="submit" class="botao">Entrar</button>
-      </form>
+    <main id="topo-landing">
 
-      <!-- Formulário: criar conta -->
-      <form id="form-criar" class="formulario" hidden novalidate>
-        <div class="campo">
-          <label for="criar-nome">Nome de usuário</label>
-          <input id="criar-nome" type="text" autocomplete="username" maxlength="20" required>
-        </div>
-        <div class="campo">
-          <label for="criar-email">Email</label>
-          <input id="criar-email" type="email" autocomplete="email" required>
-        </div>
-        <div class="campo">
-          <label for="criar-senha">Senha (mínimo de 6 caracteres)</label>
-          <input id="criar-senha" type="password" autocomplete="new-password" required>
-        </div>
-        <div class="aceite">
-          <input id="criar-aceite" type="checkbox">
-          <label for="criar-aceite">Li e aceito os <a href="privacidade.html" target="_blank" rel="noopener">termos e a política de privacidade</a>. Meu nome de usuário, minha equipe e minhas postagens ficarão visíveis para os outros usuários.</label>
-        </div>
-        <p id="msg-criar" class="mensagem" role="alert"></p>
-        <button type="submit" class="botao">Criar conta</button>
-      </form>
+      <!-- APRESENTAÇÃO -->
+      <section class="secao">
+        <div class="container">
+          <div class="heroi">
+            <div class="logo-palco">
+              <img src="img/logo.png" alt="Corredor dentro de um círculo com quatro integrantes de equipe" width="460" height="460">
+            </div>
 
-      <p class="login-rodape"><a href="privacidade.html">Termos e privacidade</a></p>
-    </div>
-  </main>
+            <div class="heroi-texto">
+              <h1 class="heroi-titulo">Os treinos da sua equipe de corrida, num só lugar</h1>
+              <p class="heroi-lead">O Runners Conecting organiza os treinos, junta as fotos e responde as dúvidas das equipes de corrida da região. Chega de procurar informação perdida no grupo.</p>
+              <div class="heroi-botoes">
+                <a class="botao" href="#acesso" data-aba="criar">Criar minha conta</a>
+                <a class="link-simples" href="#acesso" data-aba="entrar">Já tenho conta</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMO FUNCIONA -->
+      <section class="secao secao-clara">
+        <div class="container">
+          <h2 class="titulo-secao">Como funciona</h2>
+          <ol class="passos">
+            <li>
+              <h3>Crie sua conta</h3>
+              <p>Cadastre-se em um minuto e escolha a sua equipe.</p>
+            </li>
+            <li>
+              <h3>Acompanhe os treinos</h3>
+              <p>O líder marca o dia, o horário e o local de saída. Você confirma presença com um toque.</p>
+            </li>
+            <li>
+              <h3>Participe da comunidade</h3>
+              <p>Poste fotos, comente e tire dúvidas com quem corre na região.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- O QUE VOCÊ ENCONTRA -->
+      <section class="secao">
+        <div class="container">
+          <h2 class="titulo-secao">O que você encontra</h2>
+          <ul class="sobre-lista">
+            <li>
+              <h3>Treinos com presença confirmada</h3>
+              <p>O líder publica o treino uma vez e todos veem quem vai. Dá para compartilhar no WhatsApp com a mensagem pronta.</p>
+            </li>
+            <li>
+              <h3>Aviso fixado do líder</h3>
+              <p>Recados importantes, como mudança de local ou treino cancelado, ficam no topo e não se perdem no meio das conversas.</p>
+            </li>
+            <li>
+              <h3>Mural com fotos e curtidas</h3>
+              <p>Cada equipe tem o seu mural, e a Comunidade reúne as fotos e as mensagens de todo mundo.</p>
+            </li>
+            <li>
+              <h3>Dúvidas e respostas</h3>
+              <p>Pergunte sobre treino, equipamento e provas. Quem já passou pela mesma dúvida responde, e a pergunta é marcada como resolvida.</p>
+            </li>
+            <li>
+              <h3>Integrantes e histórico</h3>
+              <p>Veja quem faz parte da equipe e os treinos que já aconteceram.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- PARA QUEM -->
+      <section class="secao secao-clara">
+        <div class="container">
+          <h2 class="titulo-secao">Para líderes e integrantes</h2>
+          <div class="publicos">
+            <div class="publico">
+              <h3>Se você é líder</h3>
+              <p>Marque os treinos uma vez e repita nas semanas seguintes, fixe avisos para a equipe, compartilhe tudo no WhatsApp e modere o mural da sua equipe.</p>
+            </div>
+            <div class="publico">
+              <h3>Se você é integrante</h3>
+              <p>Veja o próximo treino assim que abrir o site, confirme presença, poste as suas fotos e tire dúvidas com quem já tem experiência.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PERGUNTAS FREQUENTES -->
+      <section class="secao">
+        <div class="container container-estreito">
+          <h2 class="titulo-secao">Perguntas frequentes</h2>
+          <div class="faq">
+            <details>
+              <summary>O site é gratuito?</summary>
+              <p>Sim. Criar a conta e usar o site não custa nada.</p>
+            </details>
+            <details>
+              <summary>Preciso instalar um aplicativo?</summary>
+              <p>Não. O site funciona direto no navegador do celular e do computador.</p>
+            </details>
+            <details>
+              <summary>Quem vê as minhas postagens?</summary>
+              <p>Só quem tem conta e fez login vê o seu nome de usuário, a sua equipe e as suas postagens. O seu email não aparece para ninguém. As fotos ficam em endereço público: quem receber o link direto de uma foto consegue abri-la. Os detalhes estão nos <a href="privacidade.html">termos e na política de privacidade</a>.</p>
+            </details>
+            <details>
+              <summary>Como vira líder de uma equipe?</summary>
+              <p>Os líderes são definidos pelo administrador do site. Se você coordena uma equipe, fale com ele para receber essa função.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ENTRAR OU CRIAR CONTA -->
+      <section id="acesso" class="secao secao-clara acesso">
+        <div class="container">
+          <div class="login-caixa">
+            <h2 class="login-titulo">Entrar ou criar conta</h2>
+            <p class="login-texto">Acesse para acompanhar os treinos da sua equipe.</p>
+
+            <div class="abas" role="tablist" aria-label="Entrar ou criar conta">
+              <button type="button" id="aba-entrar" class="aba" role="tab" aria-selected="true" aria-controls="form-entrar">Entrar</button>
+              <button type="button" id="aba-criar" class="aba" role="tab" aria-selected="false" aria-controls="form-criar">Criar conta</button>
+            </div>
+
+            <!-- Formulário: entrar -->
+            <form id="form-entrar" class="formulario" novalidate>
+              <div class="campo">
+                <label for="entrar-email">Email</label>
+                <input id="entrar-email" type="email" autocomplete="email" required>
+              </div>
+              <div class="campo">
+                <label for="entrar-senha">Senha</label>
+                <input id="entrar-senha" type="password" autocomplete="current-password" required>
+              </div>
+              <p id="msg-entrar" class="mensagem" role="alert"></p>
+              <button type="submit" class="botao">Entrar</button>
+            </form>
+
+            <!-- Formulário: criar conta -->
+            <form id="form-criar" class="formulario" hidden novalidate>
+              <div class="campo">
+                <label for="criar-nome">Nome de usuário</label>
+                <input id="criar-nome" type="text" autocomplete="username" maxlength="20" required>
+              </div>
+              <div class="campo">
+                <label for="criar-email">Email</label>
+                <input id="criar-email" type="email" autocomplete="email" required>
+              </div>
+              <div class="campo">
+                <label for="criar-senha">Senha (mínimo de 6 caracteres)</label>
+                <input id="criar-senha" type="password" autocomplete="new-password" required>
+              </div>
+              <div class="aceite">
+                <input id="criar-aceite" type="checkbox">
+                <label for="criar-aceite">Li e aceito os <a href="privacidade.html" target="_blank" rel="noopener">termos e a política de privacidade</a>. Meu nome de usuário, minha equipe e minhas postagens ficarão visíveis para os outros usuários.</label>
+              </div>
+              <p id="msg-criar" class="mensagem" role="alert"></p>
+              <button type="submit" class="botao">Criar conta</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="rodape">
+      <div class="container">
+        <p>Runners Conecting. Equipes de corrida da região, organizadas. <a href="privacidade.html">Termos e privacidade</a></p>
+      </div>
+    </footer>
+
+  </div>
 
   <!-- =========================================================
        TELA 2: O SITE (aparece depois do login)
@@ -110,6 +246,15 @@
       <!-- INÍCIO -->
       <section id="inicio" class="secao">
         <div class="container">
+          <!-- Aviso fixado pelo líder da equipe da pessoa (aparece só se houver aviso) -->
+          <div id="aviso-home" class="aviso-fixado aviso-home" hidden>
+            <p id="aviso-home-titulo" class="aviso-fixado-titulo"></p>
+            <p id="aviso-home-texto" class="aviso-fixado-texto"></p>
+            <div class="aviso-fixado-rodape">
+              <a id="aviso-home-link" class="link-branco" href="#">Abrir a página da equipe</a>
+            </div>
+          </div>
+
           <div class="heroi">
             <div class="logo-palco">
               <img src="img/logo.png" alt="Corredor dentro de um círculo com quatro integrantes de equipe" width="460" height="460">
@@ -117,30 +262,17 @@
 
             <div class="heroi-texto">
               <h1 class="heroi-titulo">Bem-vindo, <span id="nome-usuario"></span>.</h1>
-              <p class="heroi-lead">Aqui as equipes de corrida da região combinam os treinos e conversam de forma organizada num só lugar.</p>
+              <p class="heroi-lead">Veja o próximo treino da sua equipe e as novidades da comunidade.</p>
               <div class="heroi-botoes">
-                <a class="botao" href="#equipes">Escolher minha equipe</a>
+                <a id="botao-minha-equipe" class="botao" href="#equipes">Escolher minha equipe</a>
                 <a class="link-simples" href="#comunidade">Ver a comunidade</a>
               </div>
             </div>
           </div>
 
-          <div class="sobre">
-            <h2 class="titulo-secao">Para que serve o site</h2>
-            <ul class="sobre-lista">
-              <li>
-                <h3>Treinos combinados</h3>
-                <p>O líder de cada equipe publica o dia, o horário e o local de saída. Você confirma presença e ninguém precisa perguntar no grupo.</p>
-              </li>
-              <li>
-                <h3>Integrantes à vista</h3>
-                <p>Veja quem faz parte da sua equipe e quem vai a cada treino.</p>
-              </li>
-              <li>
-                <h3>Dúvidas respondidas</h3>
-                <p>Pergunte e responda. Quem já passou pela mesma dúvida ajuda quem está chegando.</p>
-              </li>
-            </ul>
+          <div class="sobre painel-treino">
+            <h2 class="titulo-secao">Próximo treino</h2>
+            <div id="painel-treino-conteudo" class="painel-treino-conteudo"></div>
           </div>
         </div>
       </section>
