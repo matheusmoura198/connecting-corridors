@@ -1,3 +1,12 @@
+// =========================================================
+// PÁGINA DA EQUIPE (equipe.html)
+//
+// Mostra os treinos da equipe, deixa os integrantes confirmarem
+// presença e deixa o líder marcar, editar e apagar treinos.
+// Depende do comum.js (precisa vir antes no HTML).
+// =========================================================
+
+
 // ---------- Qual equipe é esta página? ----------
 const parametros = new URLSearchParams(window.location.search)
 // A equipe é descoberta em iniciar(), depois que a lista de equipes carrega
@@ -27,6 +36,20 @@ const botaoSalvarTreino = document.getElementById("botao-salvar-treino")
 const botaoCancelarTreino = document.getElementById("botao-cancelar-treino")
 
 const avisoPresenca = document.getElementById("aviso-presenca")
+const avisoFixado = document.getElementById("aviso-fixado")
+const avisoFixadoTexto = document.getElementById("aviso-fixado-texto")
+const avisoFixadoData = document.getElementById("aviso-fixado-data")
+const avisoFixadoWhatsapp = document.getElementById("aviso-fixado-whatsapp")
+const areaAviso = document.getElementById("area-aviso")
+const formAviso = document.getElementById("form-aviso")
+const campoAviso = document.getElementById("aviso-campo")
+const msgAviso = document.getElementById("msg-aviso")
+const botaoPublicarAviso = document.getElementById("botao-publicar-aviso")
+const botaoRemoverAviso = document.getElementById("botao-remover-aviso")
+
+const areaHistorico = document.getElementById("area-historico")
+const listaHistorico = document.getElementById("lista-historico")
+
 const listaTreinos = document.getElementById("lista-treinos")
 const semTreinos = document.getElementById("sem-treinos")
 
@@ -38,29 +61,22 @@ let treinoEmEdicao = null
 
 
 // ---------- Funções de apoio ----------
-// Data de hoje no formato do banco: 2026-10-11
-function dataDeHoje() {
-  const agora = new Date()
-  const mes = String(agora.getMonth() + 1).padStart(2, "0")
-  const dia = String(agora.getDate()).padStart(2, "0")
-  return agora.getFullYear() + "-" + mes + "-" + dia
-}
-
-// Transforma 2026-10-11 em "Domingo, 11/10"
-function formatarDiaDoTreino(diaTexto) {
+// Soma dias a uma data no formato 2026-10-11 (pode ser negativo)
+function adicionarDias(diaTexto, dias) {
   const partes = diaTexto.split("-")
-  const data = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]))
-  const texto = data.toLocaleDateString("pt-BR", {
-    weekday: "long",
-    day: "2-digit",
-    month: "2-digit"
-  })
-  return texto.charAt(0).toUpperCase() + texto.slice(1)
+  const data = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]) + dias)
+  const mes = String(data.getMonth() + 1).padStart(2, "0")
+  const dia = String(data.getDate()).padStart(2, "0")
+  return data.getFullYear() + "-" + mes + "-" + dia
 }
 
-// O banco devolve 05:30:00. Mostramos só 05:30
-function formatarHorario(horarioTexto) {
-  return horarioTexto.slice(0, 5)
+// Para repetir um treino: o mesmo dia da semana, de hoje em diante
+function proximaDataDoMesmoDiaDaSemana(diaTexto) {
+  let proximo = adicionarDias(diaTexto, 7)
+  while (proximo < dataDeHoje()) {
+    proximo = adicionarDias(proximo, 7)
+  }
+  return proximo
 }
 
 function souMembro() {
@@ -93,7 +109,9 @@ async function iniciar() {
   pagina.hidden = false
   montarTopo()
   montarAreaDoLider()
+  mostrarAviso()
   await mostrarTreinos()
+  await mostrarHistorico()
   iniciarMural(equipe.nome)
   iniciarDuvidas(equipe.nome)
   await mostrarIntegrantes()
@@ -152,6 +170,88 @@ botaoEntrarEquipe.addEventListener("click", async function () {
 })
 
 
+// ---------- Aviso fixado do líder ----------
+
+function montarMensagemDoAviso() {
+  const endereco = new URL("equipe.html?equipe=" + equipe.slug, window.location.href).href
+
+  return [
+    "📢 Aviso da " + equipe.nome,
+    "",
+    equipe.aviso,
+    "",
+    "Veja no site:",
+    endereco
+  ].join("\n")
+}
+
+// Mostra (ou esconde) o aviso no topo e prepara o formulário do líder
+function mostrarAviso() {
+  const texto = equipe.aviso || ""
+
+  avisoFixado.hidden = texto === ""
+  botaoRemoverAviso.hidden = texto === ""
+  campoAviso.value = texto
+  avisoFixadoWhatsapp.innerHTML = ""
+
+  if (texto === "") {
+    return
+  }
+
+  avisoFixadoTexto.textContent = texto
+  avisoFixadoData.textContent = equipe.aviso_em ? "Atualizado em " + formatarData(equipe.aviso_em) : ""
+
+  const link = criarElemento("a", "botao-whatsapp", "Compartilhar no WhatsApp")
+  link.href = "https://wa.me/?text=" + encodeURIComponent(montarMensagemDoAviso())
+  link.target = "_blank"
+  link.rel = "noopener"
+  avisoFixadoWhatsapp.appendChild(link)
+}
+
+async function salvarAviso(texto) {
+  msgAviso.textContent = ""
+  ocupado(botaoPublicarAviso, true, "Publicar aviso")
+
+  // O ".select()" devolve as linhas alteradas: se vier vazio, o banco não permitiu
+  const resposta = await cliente
+    .from("equipes")
+    .update({ aviso: texto })
+    .eq("nome", equipe.nome)
+    .select()
+
+  ocupado(botaoPublicarAviso, false, "Publicar aviso")
+
+  if (resposta.error || !resposta.data || resposta.data.length === 0) {
+    console.error("Erro ao salvar o aviso:", resposta.error)
+    msgAviso.textContent = "Não foi possível salvar o aviso. Tente de novo."
+    return
+  }
+
+  await carregarEquipes()
+  equipe = equipePorSlug(equipe.slug)
+  mostrarAviso()
+  areaAviso.open = false
+}
+
+formAviso.addEventListener("submit", async function (evento) {
+  evento.preventDefault()
+
+  const texto = campoAviso.value.trim()
+  if (texto === "") {
+    msgAviso.textContent = "Escreva o aviso, ou use o botão Remover aviso."
+    return
+  }
+  await salvarAviso(texto)
+})
+
+botaoRemoverAviso.addEventListener("click", async function () {
+  if (!window.confirm("Remover o aviso da equipe?")) {
+    return
+  }
+  await salvarAviso("")
+})
+
+
 // ---------- Compartilhar o treino no WhatsApp ----------
 
 // Monta a mensagem que vai pronta para o WhatsApp
@@ -188,6 +288,7 @@ function criarLinkDoWhatsApp(treino) {
 // ---------- Treinos ----------
 function montarAreaDoLider() {
   areaLider.hidden = !souLider()
+  areaAviso.hidden = !souLider()
   // Não deixa marcar treino em dia que já passou
   campoDia.min = dataDeHoje()
 }
@@ -276,6 +377,12 @@ function criarCartaoDeTreino(treino) {
   if (souLider()) {
     const acoes = criarElemento("div", "treino-acoes")
 
+    const repetir = criarElemento("button", "botao-texto", "Repetir")
+    repetir.type = "button"
+    repetir.addEventListener("click", function () {
+      comecarRepeticao(treino)
+    })
+
     const editar = criarElemento("button", "botao-texto", "Editar")
     editar.type = "button"
     editar.addEventListener("click", function () {
@@ -296,6 +403,7 @@ function criarCartaoDeTreino(treino) {
       await mostrarTreinos()
     })
 
+    acoes.appendChild(repetir)
     acoes.appendChild(editar)
     acoes.appendChild(apagar)
     cartao.appendChild(acoes)
@@ -325,6 +433,62 @@ async function alternarPresenca(idTreino, jaConfirmado) {
 }
 
 
+// ---------- Treinos anteriores ----------
+async function mostrarHistorico() {
+  const resposta = await cliente
+    .from("treinos")
+    .select("id, dia, horario, local_saida, tipo, observacao, presencas(user_id)")
+    .eq("equipe", equipe.nome)
+    .lt("dia", dataDeHoje())
+    .order("dia", { ascending: false })
+    .order("horario", { ascending: false })
+    .limit(10)
+
+  listaHistorico.innerHTML = ""
+
+  if (resposta.error || resposta.data.length === 0) {
+    areaHistorico.hidden = true
+    return
+  }
+
+  areaHistorico.hidden = false
+  resposta.data.forEach(function (treino) {
+    listaHistorico.appendChild(criarLinhaDoHistorico(treino))
+  })
+}
+
+function criarLinhaDoHistorico(treino) {
+  const linha = criarElemento("div", "historico-item")
+  const info = criarElemento("div", "historico-info")
+
+  info.appendChild(
+    criarElemento("p", "historico-quando", formatarDiaDoTreino(treino.dia) + " às " + formatarHorario(treino.horario))
+  )
+
+  let detalhes = "Saída: " + treino.local_saida
+  if (treino.tipo) {
+    detalhes = detalhes + " · " + treino.tipo
+  }
+  info.appendChild(criarElemento("p", "historico-detalhes", detalhes))
+
+  const total = (treino.presencas || []).length
+  const textoTotal = total === 1 ? "1 pessoa confirmou presença" : total + " pessoas confirmaram presença"
+  info.appendChild(criarElemento("p", "historico-total", textoTotal))
+  linha.appendChild(info)
+
+  if (souLider()) {
+    const repetir = criarElemento("button", "botao-texto", "Repetir")
+    repetir.type = "button"
+    repetir.addEventListener("click", function () {
+      comecarRepeticao(treino)
+    })
+    linha.appendChild(repetir)
+  }
+
+  return linha
+}
+
+
 // ---------- Formulário do líder ----------
 function comecarEdicao(treino) {
   treinoEmEdicao = treino.id
@@ -343,11 +507,32 @@ function comecarEdicao(treino) {
   areaLider.scrollIntoView({ behavior: "smooth", block: "start" })
 }
 
+// Repetir: abre o formulário com os dados de um treino e deixa o dia na
+// próxima semana (mesmo dia da semana). O líder confere e marca.
+function comecarRepeticao(treino) {
+  terminarEdicao()
+
+  campoDia.value = proximaDataDoMesmoDiaDaSemana(treino.dia)
+  campoHorario.value = formatarHorario(treino.horario)
+  campoLocal.value = treino.local_saida
+  campoTipo.value = treino.tipo
+  campoObservacao.value = treino.observacao
+
+  resumoTreino.textContent = "Repetir treino: confira o dia e marque"
+  botaoCancelarTreino.textContent = "Cancelar"
+  botaoCancelarTreino.hidden = false
+  msgTreino.textContent = ""
+
+  areaLider.open = true
+  areaLider.scrollIntoView({ behavior: "smooth", block: "start" })
+}
+
 function terminarEdicao() {
   treinoEmEdicao = null
   formTreino.reset()
   resumoTreino.textContent = "Marcar novo treino"
   botaoSalvarTreino.textContent = "Marcar treino"
+  botaoCancelarTreino.textContent = "Cancelar edição"
   botaoCancelarTreino.hidden = true
 }
 
