@@ -1474,3 +1474,217 @@ a {
     transition: none;
   }
 }
+
+/* =========================================================
+   AVISO FIXADO DO LÍDER
+   ========================================================= */
+
+.aviso-fixado {
+  margin-top: 1.1rem;
+  padding: 1.1rem 1.25rem;
+  color: var(--branco);
+  background: var(--azul-escuro);
+  border-radius: 14px;
+}
+
+.aviso-home {
+  margin: 0 0 2rem;
+}
+
+.aviso-fixado-titulo {
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.aviso-fixado-texto {
+  margin-top: 0.35rem;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.aviso-fixado-rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.9rem;
+}
+
+.aviso-fixado-data {
+  margin-right: auto;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Botões e links sobre o fundo azul escuro do aviso */
+.aviso-fixado .botao-whatsapp {
+  color: var(--branco);
+  background: transparent;
+  border-color: var(--branco);
+}
+
+.aviso-fixado .botao-whatsapp:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.link-branco {
+  font-weight: 600;
+  color: var(--branco);
+  text-underline-offset: 4px;
+}
+
+.area-aviso {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   TREINOS ANTERIORES E PRÓXIMO TREINO NA PÁGINA INICIAL
+   ========================================================= */
+
+.historico {
+  margin-top: 2rem;
+}
+
+.historico summary {
+  font-family: var(--fonte-titulo);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--azul-escuro);
+  cursor: pointer;
+}
+
+.lista-historico {
+  margin-top: 0.75rem;
+}
+
+.historico-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+.historico-quando {
+  font-weight: 600;
+}
+
+.historico-detalhes,
+.historico-total {
+  font-size: 0.95rem;
+  color: var(--texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.painel-treino-conteudo .botao {
+  margin-top: 0.75rem;
+}
+
+/* =========================================================
+   APRESENTAÇÃO (PÁGINA PARA QUEM AINDA NÃO FEZ LOGIN)
+   ========================================================= */
+
+.passos {
+  display: grid;
+  gap: 1.5rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+}
+
+.passos li {
+  counter-increment: passo;
+}
+
+.passos li::before {
+  content: counter(passo);
+  display: block;
+  margin-bottom: 0.25rem;
+  font-family: var(--fonte-titulo);
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--azul);
+}
+
+.passos h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.passos p {
+  margin-top: 0.25rem;
+  max-width: 34ch;
+  color: var(--texto-suave);
+}
+
+.publicos {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.publico {
+  padding: 1.5rem;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+}
+
+.publico h3 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--azul-escuro);
+}
+
+.publico p {
+  margin-top: 0.5rem;
+  color: var(--texto-suave);
+}
+
+.faq {
+  margin-top: 1rem;
+}
+
+.faq details {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--linha);
+}
+
+.faq summary {
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.faq details p {
+  margin-top: 0.6rem;
+  color: var(--texto-suave);
+}
+
+.acesso .login-caixa {
+  margin: 0 auto;
+}
+
+@media (min-width: 760px) {
+  .passos {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+  }
+
+  .publicos {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem;
+  }
+}
+
+.painel-treino-conteudo {
+  margin-top: 1rem;
+}
