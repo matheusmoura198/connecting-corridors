@@ -12,6 +12,11 @@ const ICONE_CORACAO =
 let equipeDoMural = null
 let limiteDePosts = POSTS_POR_VEZ
 
+// Opções do mural (usadas pela página da assessoria):
+// tipo = "treino" ou "publicacao" (null = sem separação)
+// somenteTreinador = só o treinador (ou o admin) publica
+let opcoesDoMural = { tipo: null, somenteTreinador: false }
+
 // Foto já reduzida (Blob), pronta para enviar
 let fotoEscolhida = null
 let enderecoDaPrevia = null
@@ -31,21 +36,63 @@ const listaPosts = document.getElementById("lista-posts")
 const semPosts = document.getElementById("sem-posts")
 const botaoMaisPosts = document.getElementById("botao-mais-posts")
 
+// Campos extras do treino. Só existem na página da assessoria (nas outras ficam null).
+const campoTituloPost = document.getElementById("post-titulo-campo")
+const postTitulo = document.getElementById("post-titulo")
+const campoLinkPost = document.getElementById("post-link-campo")
+const postLink = document.getElementById("post-link")
+
 
 // ---------- Começo ----------
-// Chame com null (Comunidade) ou com o nome da equipe (mural da equipe)
-function iniciarMural(nomeDaEquipe) {
+// Chame com null (Comunidade) ou com o nome da equipe (mural da equipe).
+// Na assessoria, passe também as opções: iniciarMural(nome, { tipo: "treino", somenteTreinador: true })
+function iniciarMural(nomeDaEquipe, opcoes) {
   equipeDoMural = nomeDaEquipe
+  opcoesDoMural = Object.assign({ tipo: null, somenteTreinador: false }, opcoes || {})
   limiteDePosts = POSTS_POR_VEZ
 
-  // Na Comunidade todo mundo publica. No mural, só quem é da equipe (ou o admin).
-  const podePublicar =
-    nomeDaEquipe === null || perfil.equipe === nomeDaEquipe || perfil.papel === "admin"
+  let podePublicar
+  if (opcoesDoMural.somenteTreinador) {
+    // Assessoria: só o treinador (líder da assessoria) ou o admin
+    podePublicar = ehTreinadorDe(nomeDaEquipe)
+  } else {
+    // Na Comunidade todo mundo publica. No mural, só quem é da equipe (ou o admin).
+    podePublicar =
+      nomeDaEquipe === null || perfil.equipe === nomeDaEquipe || perfil.papel === "admin"
+  }
 
   formPost.hidden = !podePublicar
   avisoMural.hidden = podePublicar
 
+  // Título e link da planilha: só no formulário de treino
+  const ehTreino = opcoesDoMural.tipo === "treino"
+  if (campoTituloPost) {
+    campoTituloPost.hidden = !ehTreino
+  }
+  if (campoLinkPost) {
+    campoLinkPost.hidden = !ehTreino
+  }
+  msgPost.textContent = ""
+
   mostrarPosts(false)
+}
+
+// O treinador de uma equipe/assessoria é quem tem o papel "lider" nela. O admin vale em qualquer uma.
+function ehTreinadorDe(nomeDaEquipe) {
+  if (perfil.papel === "admin") {
+    return true
+  }
+  return perfil.papel === "lider" && nomeDaEquipe !== null && perfil.equipe === nomeDaEquipe
+}
+
+// Só aceita links http/https (evita "javascript:" e parecidos)
+function linkValido(texto) {
+  try {
+    const endereco = new URL(texto)
+    return endereco.protocol === "https:" || endereco.protocol === "http:"
+  } catch (erro) {
+    return false
+  }
 }
 
 
@@ -157,8 +204,20 @@ formPost.addEventListener("submit", async function (evento) {
   evento.preventDefault()
 
   const texto = postTexto.value.trim()
-  if (texto === "" && !fotoEscolhida) {
-    msgPost.textContent = "Escreva uma mensagem ou escolha uma foto."
+  const ehTreino = opcoesDoMural.tipo === "treino"
+  const titulo = ehTreino && postTitulo ? postTitulo.value.trim() : ""
+  const link = ehTreino && postLink ? postLink.value.trim() : ""
+
+  if (ehTreino && titulo.length < 3) {
+    msgPost.textContent = "Dê um título ao treino (pelo menos 3 letras)."
+    return
+  }
+  if (link !== "" && !linkValido(link)) {
+    msgPost.textContent = "O link da planilha precisa começar com https://"
+    return
+  }
+  if (texto === "" && !fotoEscolhida && link === "") {
+    msgPost.textContent = "Escreva uma mensagem, escolha uma foto ou cole o link da planilha."
     return
   }
 
@@ -181,9 +240,16 @@ formPost.addEventListener("submit", async function (evento) {
   }
 
   // 2. Cria a postagem
-  const resposta = await cliente
-    .from("posts")
-    .insert({ equipe: equipeDoMural, texto: texto, foto_caminho: caminho })
+  const novoPost = { equipe: equipeDoMural, texto: texto, foto_caminho: caminho }
+  if (opcoesDoMural.tipo) {
+    novoPost.tipo = opcoesDoMural.tipo
+  }
+  if (ehTreino) {
+    novoPost.titulo = titulo
+    novoPost.link = link === "" ? null : link
+  }
+
+  const resposta = await cliente.from("posts").insert(novoPost)
 
   ocupado(botaoPublicar, false, "Publicar")
 
@@ -197,21 +263,33 @@ formPost.addEventListener("submit", async function (evento) {
   }
 
   postTexto.value = ""
+  if (postTitulo) {
+    postTitulo.value = ""
+  }
+  if (postLink) {
+    postLink.value = ""
+  }
   limparFotoEscolhida()
   await mostrarPosts(true)
 })
 
 
 // ---------- Lista de postagens ----------
-async function mostrarPosts(destacarPrimeiro) {
+
+// Monta a consulta das postagens. "completo" inclui as colunas novas (tipo, título,
+// link da planilha e fixado). Se o SQL de atualização ainda não foi rodado, o
+// mural cai para a consulta antiga e continua funcionando.
+function montarConsultaDePosts(completo) {
   // Atenção: "profiles!posts_user_id_fkey(nome)" diz ao Supabase qual ligação usar
   // para buscar o nome de quem postou. Sem isso, ele encontra dois caminhos entre
   // postagens e perfis (direto e pelas curtidas) e se recusa a carregar as postagens.
-  let consulta = cliente
-    .from("posts")
-    .select(
-      "id, user_id, equipe, texto, foto_caminho, criado_em, profiles!posts_user_id_fkey(nome), curtidas(user_id), post_comentarios(id, user_id, texto, criado_em, profiles(nome))"
-    )
+  const colunas =
+    "id, user_id, equipe, texto, foto_caminho, criado_em, " +
+    (completo ? "tipo, titulo, link, fixado, " : "") +
+    "profiles!posts_user_id_fkey(nome), curtidas(user_id), " +
+    "post_comentarios(id, user_id, texto, criado_em, profiles(nome))"
+
+  let consulta = cliente.from("posts").select(colunas)
 
   if (equipeDoMural === null) {
     consulta = consulta.is("equipe", null)
@@ -219,9 +297,25 @@ async function mostrarPosts(destacarPrimeiro) {
     consulta = consulta.eq("equipe", equipeDoMural)
   }
 
-  const resposta = await consulta
-    .order("criado_em", { ascending: false })
-    .limit(limiteDePosts)
+  if (completo && opcoesDoMural.tipo) {
+    consulta = consulta.eq("tipo", opcoesDoMural.tipo)
+  }
+
+  // Fixados primeiro, depois do mais novo para o mais antigo
+  if (completo) {
+    consulta = consulta.order("fixado", { ascending: false })
+  }
+  return consulta.order("criado_em", { ascending: false }).limit(limiteDePosts)
+}
+
+async function mostrarPosts(destacarPrimeiro) {
+  let resposta = await montarConsultaDePosts(true)
+
+  // Coluna que ainda não existe no banco (42703): usa a consulta antiga,
+  // a não ser na assessoria, que depende das colunas novas.
+  if (resposta.error && resposta.error.code === "42703" && !opcoesDoMural.tipo) {
+    resposta = await montarConsultaDePosts(false)
+  }
 
   listaPosts.innerHTML = ""
 
@@ -233,7 +327,15 @@ async function mostrarPosts(destacarPrimeiro) {
     return
   }
 
-  semPosts.textContent = "Ainda não há postagens. Seja a primeira pessoa a publicar."
+  if (opcoesDoMural.tipo === "treino") {
+    semPosts.textContent = ehTreinadorDe(equipeDoMural)
+      ? "Nenhum treino publicado ainda. Use o formulário acima para publicar o primeiro."
+      : "O treinador ainda não publicou treinos."
+  } else if (opcoesDoMural.tipo === "publicacao") {
+    semPosts.textContent = "Ainda não há publicações do treinador."
+  } else {
+    semPosts.textContent = "Ainda não há postagens. Seja a primeira pessoa a publicar."
+  }
   semPosts.hidden = resposta.data.length > 0
 
   // Se veio o máximo pedido, provavelmente há postagens mais antigas
@@ -241,7 +343,7 @@ async function mostrarPosts(destacarPrimeiro) {
 
   resposta.data.forEach(function (post, posicao) {
     const cartao = criarCartaoDePost(post)
-    if (destacarPrimeiro && posicao === 0) {
+    if (destacarPrimeiro && posicao === 0 && !post.fixado) {
       cartao.classList.add("novo")
     }
     listaPosts.appendChild(cartao)
@@ -261,23 +363,73 @@ function podeApagarPost(post) {
   return perfil.papel === "lider" && post.equipe !== null && perfil.equipe === post.equipe
 }
 
-function criarCartaoDePost(post) {
-  const cartao = criarElemento("article", "post")
+// Quem pode fixar: o treinador/líder da equipe (ou o admin) nas postagens da equipe
+function podeFixarPost(post) {
+  return post.equipe !== null && ehTreinadorDe(post.equipe)
+}
 
-  // Topo: nome, data e botão de apagar
+async function alternarFixado(post) {
+  // O ".select()" devolve as linhas alteradas: se vier vazio, o banco não permitiu
+  const resposta = await cliente
+    .from("posts")
+    .update({ fixado: !post.fixado })
+    .eq("id", post.id)
+    .select("id")
+
+  if (resposta.error || !resposta.data || resposta.data.length === 0) {
+    console.error("Erro ao fixar a postagem:", resposta.error)
+    window.alert(
+      post.fixado
+        ? "Não foi possível desafixar. Tente de novo."
+        : "Não foi possível fixar. Lembre que cada seção aceita no máximo 3 itens fixados."
+    )
+    return
+  }
+  await mostrarPosts(false)
+}
+
+function criarCartaoDePost(post) {
+  const cartao = criarElemento("article", post.fixado ? "post post-fixado" : "post")
+
+  // Topo: etiqueta de fixado, nome, data e botões de fixar e apagar
   const topo = criarElemento("div", "post-topo")
+  if (post.fixado) {
+    topo.appendChild(criarElemento("span", "post-etiqueta", "Fixado"))
+  }
   topo.appendChild(criarElemento("span", "post-nome", post.profiles ? post.profiles.nome : "Usuário"))
   topo.appendChild(criarElemento("span", "post-data", formatarData(post.criado_em)))
 
+  // Os botões do topo ficam juntos, à direita
+  const acoesTopo = criarElemento("span", "post-acoes-topo")
+
+  if (podeFixarPost(post)) {
+    const fixar = criarElemento("button", "botao-texto", post.fixado ? "Desafixar" : "Fixar")
+    fixar.type = "button"
+    fixar.addEventListener("click", async function () {
+      fixar.disabled = true
+      await alternarFixado(post)
+    })
+    acoesTopo.appendChild(fixar)
+  }
+
   if (podeApagarPost(post)) {
-    const apagar = criarElemento("button", "botao-texto botao-texto-perigo post-apagar", "Apagar")
+    const apagar = criarElemento("button", "botao-texto botao-texto-perigo", "Apagar")
     apagar.type = "button"
     apagar.addEventListener("click", async function () {
       await apagarPost(post)
     })
-    topo.appendChild(apagar)
+    acoesTopo.appendChild(apagar)
+  }
+
+  if (acoesTopo.childNodes.length > 0) {
+    topo.appendChild(acoesTopo)
   }
   cartao.appendChild(topo)
+
+  // Título do treino
+  if (post.titulo) {
+    cartao.appendChild(criarElemento("h3", "post-titulo", post.titulo))
+  }
 
   // Texto
   if (post.texto) {
@@ -298,6 +450,15 @@ function criarCartaoDePost(post) {
 
     link.appendChild(imagem)
     cartao.appendChild(link)
+  }
+
+  // Link da planilha do treinador
+  if (post.link && linkValido(post.link)) {
+    const planilha = criarElemento("a", "botao botao-pequeno botao-contorno post-planilha", "Abrir a planilha")
+    planilha.href = post.link
+    planilha.target = "_blank"
+    planilha.rel = "noopener noreferrer"
+    cartao.appendChild(planilha)
   }
 
   // Rodapé: curtir e comentar
