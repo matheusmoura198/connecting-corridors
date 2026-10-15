@@ -1835,3 +1835,10 @@ a {
   align-items: center;
   gap: 1rem;
 }
+
+
+/* "Esqueci minha senha" abaixo do botão Entrar */
+.esqueci {
+  margin-top: 1rem;
+  text-align: center;
+}
