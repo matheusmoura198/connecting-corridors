@@ -1,12 +1,3 @@
-// =========================================================
-// PÁGINA DA EQUIPE (equipe.html)
-//
-// Mostra os treinos da equipe, deixa os integrantes confirmarem
-// presença e deixa o líder marcar, editar e apagar treinos.
-// Depende do comum.js (precisa vir antes no HTML).
-// =========================================================
-
-
 // ---------- Qual equipe é esta página? ----------
 const parametros = new URLSearchParams(window.location.search)
 // A equipe é descoberta em iniciar(), depois que a lista de equipes carrega
@@ -103,6 +94,12 @@ async function iniciar() {
 
   if (!equipe) {
     window.location.href = "index.html#equipes"
+    return
+  }
+
+  // Assessorias têm página própria
+  if (ehAssessoria(equipe)) {
+    window.location.replace(enderecoDaEquipe(equipe))
     return
   }
 
