@@ -1688,3 +1688,36 @@ a {
 .painel-treino-conteudo {
   margin-top: 1rem;
 }
+
+
+/* Assessoria: publicações fixadas e materiais de treino */
+.post-selo-fixado {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--azul-claro);
+  color: var(--azul);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.post-fixar {
+  font-weight: 700;
+}
+
+.post-titulo {
+  margin: 0;
+  color: var(--azul-escuro, #153c76);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.45rem;
+}
+
+.post-link-planilha {
+  justify-self: start;
+  text-decoration: none;
+}
+
+.post-topo {
+  flex-wrap: wrap;
+}
