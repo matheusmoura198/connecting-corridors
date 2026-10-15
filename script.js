@@ -47,8 +47,24 @@ async function mostrarTela() {
     return
   }
 
+  // Veio pelo link de "Esqueci minha senha": mostra só o formulário de nova senha
+  if (LINK_DE_SENHA) {
+    await cliente.auth.getSession() // espera o Supabase ler o link
+    mostrarLogin()
+    abaEntrar.parentElement.hidden = true
+    formEntrar.hidden = true
+    formCriar.hidden = true
+    formNovaSenha.hidden = false
+    return
+  }
+
   const resposta = await cliente.auth.getSession()
-  const sessao = resposta.data.session
+
+  // Login antigo que o Supabase não reconhece mais: limpa e pede para entrar de novo
+  if (resposta.error) {
+    await cliente.auth.signOut({ scope: "local" })
+  }
+  const sessao = resposta.error ? null : resposta.data.session
 
   perfil = sessao ? await carregarPerfil(sessao.user.id) : null
 
@@ -503,5 +519,86 @@ formSugestao.addEventListener("submit", async function (evento) {
 })
 
 
+// ---------- Esqueci minha senha ----------
+const botaoEsqueci = document.getElementById("botao-esqueci")
+const formNovaSenha = document.getElementById("form-nova-senha")
+const campoNovaSenha = document.getElementById("nova-senha")
+const msgNovaSenha = document.getElementById("msg-nova-senha")
+
+botaoEsqueci.addEventListener("click", async function () {
+  if (!cliente) {
+    return
+  }
+
+  const email = document.getElementById("entrar-email").value.trim().toLowerCase()
+  msgEntrar.classList.remove("ok")
+
+  if (email === "" || !email.includes("@")) {
+    msgEntrar.textContent = "Digite seu email no campo acima e toque em Esqueci minha senha."
+    return
+  }
+
+  botaoEsqueci.disabled = true
+  const resposta = await cliente.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  })
+  botaoEsqueci.disabled = false
+
+  if (resposta.error) {
+    msgEntrar.textContent = mensagemDeErro(resposta.error)
+    return
+  }
+
+  // A mesma resposta para qualquer email: não revela quem tem conta
+  msgEntrar.classList.add("ok")
+  msgEntrar.textContent = "Se esse email tiver conta, enviamos um link para criar uma nova senha. Olhe também o spam."
+})
+
+formNovaSenha.addEventListener("submit", async function (evento) {
+  evento.preventDefault()
+
+  const senha = campoNovaSenha.value
+  if (senha.length < 6) {
+    msgNovaSenha.textContent = "A senha precisa ter pelo menos 6 caracteres."
+    return
+  }
+
+  const botao = formNovaSenha.querySelector("button[type=submit]")
+  msgNovaSenha.textContent = ""
+  ocupado(botao, true, "Salvar nova senha")
+
+  const resposta = await cliente.auth.updateUser({ password: senha })
+
+  ocupado(botao, false, "Salvar nova senha")
+
+  if (resposta.error) {
+    msgNovaSenha.textContent = mensagemDeErro(resposta.error)
+    return
+  }
+
+  // Senha trocada: a pessoa já está logada e entra no site
+  formNovaSenha.reset()
+  formNovaSenha.hidden = true
+  abaEntrar.parentElement.hidden = false
+  LINK_DE_SENHA = false
+  window.history.replaceState(null, "", window.location.pathname)
+  trocarAba("entrar")
+  await mostrarTela()
+  window.scrollTo(0, 0)
+})
+
+
+// ---------- Convidar um amigo ----------
+const botaoConvidar = document.getElementById("botao-convidar")
+const convite =
+  "Vem correr com a gente! O Runners Conecting junta os treinos, as fotos e as dúvidas das equipes de corrida da região: " +
+  window.location.origin +
+  window.location.pathname
+botaoConvidar.href = "https://wa.me/?text=" + encodeURIComponent(convite)
+
+
 // ---------- Começo: decide qual tela mostrar ----------
+if (LINK_EXPIRADO) {
+  msgEntrar.textContent = "Esse link expirou. Toque em Esqueci minha senha para receber um novo."
+}
 mostrarTela()
