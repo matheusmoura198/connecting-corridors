@@ -182,6 +182,17 @@
               </div>
               <p id="msg-entrar" class="mensagem" role="alert"></p>
               <button type="submit" class="botao">Entrar</button>
+              <p class="esqueci"><button type="button" id="botao-esqueci" class="botao-texto">Esqueci minha senha</button></p>
+            </form>
+
+            <!-- Formulário: nova senha (abre pelo link enviado por email) -->
+            <form id="form-nova-senha" class="formulario" hidden novalidate>
+              <div class="campo">
+                <label for="nova-senha">Nova senha (mínimo de 6 caracteres)</label>
+                <input id="nova-senha" type="password" autocomplete="new-password" required>
+              </div>
+              <p id="msg-nova-senha" class="mensagem" role="alert"></p>
+              <button type="submit" class="botao">Salvar nova senha</button>
             </form>
 
             <!-- Formulário: criar conta -->
@@ -266,6 +277,7 @@
               <div class="heroi-botoes">
                 <a id="botao-minha-equipe" class="botao" href="#equipes">Escolher minha equipe</a>
                 <a class="link-simples" href="#comunidade">Ver a comunidade</a>
+                <a id="botao-convidar" class="link-simples" href="#" target="_blank" rel="noopener noreferrer">Convidar um amigo</a>
               </div>
             </div>
           </div>
