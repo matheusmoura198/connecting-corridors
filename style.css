@@ -1690,34 +1690,148 @@ a {
 }
 
 
-/* Assessoria: publicações fixadas e materiais de treino */
-.post-selo-fixado {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.55rem;
+/* =========================================================
+   ASSESSORIA (treinador publica, alunos acompanham)
+   ========================================================= */
+
+/* Etiqueta "Assessoria" no canto do quadro da equipe, na página inicial */
+.equipe-etiqueta {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 1;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--branco);
+  background: rgba(14, 17, 22, 0.75);
   border-radius: 999px;
-  background: var(--azul-claro);
-  color: var(--azul);
-  font-size: 0.8rem;
-  font-weight: 700;
 }
 
-.post-fixar {
-  font-weight: 700;
+/* Botão de contorno (ex.: "Ver o Instagram", "Abrir a planilha") */
+.botao.botao-contorno {
+  color: var(--azul);
+  background: transparent;
+  border: 2px solid var(--azul);
+}
+
+.botao.botao-contorno:hover {
+  color: var(--azul-escuro);
+  background: var(--azul-claro);
+  border-color: var(--azul-escuro);
+}
+
+/* Abas Treinos / Publicações */
+.abas-area {
+  max-width: 360px;
+}
+
+/* Apresentação, serviços e contatos */
+.texto-apresentacao {
+  max-width: 62ch;
+  margin-top: 0.75rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bloco-servicos {
+  margin-top: 1.5rem;
+}
+
+.bloco-servicos h3 {
+  font-size: 1.5rem;
+}
+
+.lista-servicos {
+  display: grid;
+  gap: 0.4rem;
+  max-width: 62ch;
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.contatos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 1.5rem;
+}
+
+.contatos:empty {
+  display: none;
+}
+
+.contato-texto {
+  color: var(--texto-suave);
+  font-size: 0.95rem;
+}
+
+/* Postagens fixadas e treinos */
+.post-fixado {
+  border: 2px solid var(--azul);
+}
+
+.post-etiqueta {
+  padding: 0.1rem 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--branco);
+  background: var(--azul);
+  border-radius: 999px;
+}
+
+.post-acoes-topo {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
 }
 
 .post-titulo {
-  margin: 0;
-  color: var(--azul-escuro, #153c76);
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 1.45rem;
+  font-size: 1.6rem;
+  overflow-wrap: anywhere;
 }
 
-.post-link-planilha {
+.post-planilha {
   justify-self: start;
-  text-decoration: none;
 }
 
-.post-topo {
+/* Gestão do treinador: pedidos de entrada e alunos */
+.subtitulo-gestao {
+  margin-top: 1.75rem;
+  font-size: 1.5rem;
+}
+
+.lista-gestao {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.gestao-item {
+  display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--branco);
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+}
+
+.gestao-nome {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.gestao-detalhe {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.gestao-acoes {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
