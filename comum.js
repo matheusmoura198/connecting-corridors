@@ -1,3 +1,9 @@
+// ---------- Links que chegam pelo email ----------
+// Precisam ser lidos antes de o Supabase limpar o endereço da página.
+let LINK_DE_SENHA = window.location.hash.includes("type=recovery")
+const LINK_EXPIRADO = window.location.hash.includes("error_code=otp_expired")
+
+
 // ---------- Conexão com o Supabase ----------
 const configurado =
   typeof SUPABASE_URL === "string" &&
@@ -125,6 +131,14 @@ async function obterPerfilLogado() {
   }
 
   const resposta = await cliente.auth.getSession()
+
+  // Login antigo que o Supabase não reconhece mais ("Invalid Refresh Token"):
+  // limpa o login guardado no navegador para a pessoa poder entrar de novo.
+  if (resposta.error) {
+    await cliente.auth.signOut({ scope: "local" })
+    return null
+  }
+
   const sessao = resposta.data.session
   if (!sessao) {
     return null
