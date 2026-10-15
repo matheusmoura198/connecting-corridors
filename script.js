@@ -231,8 +231,10 @@ function atualizarBotaoMinhaEquipe() {
   })
 
   if (minhaEquipe) {
-    botaoMinhaEquipe.textContent = "Abrir a página da minha equipe"
-    botaoMinhaEquipe.href = "equipe.html?equipe=" + minhaEquipe.slug
+    botaoMinhaEquipe.textContent = ehAssessoria(minhaEquipe)
+      ? "Abrir a página da minha assessoria"
+      : "Abrir a página da minha equipe"
+    botaoMinhaEquipe.href = enderecoDaEquipe(minhaEquipe)
   } else {
     botaoMinhaEquipe.textContent = "Escolher minha equipe"
     botaoMinhaEquipe.href = "#equipes"
@@ -249,6 +251,17 @@ async function mostrarProximoTreino() {
 
   if (!minhaEquipe) {
     painelTreinoConteudo.appendChild(criarElemento("p", "vazio", "Escolha a sua equipe para ver os próximos treinos."))
+    return
+  }
+
+  // Na assessoria os treinos são orientações e planilhas do treinador (não têm dia e horário)
+  if (ehAssessoria(minhaEquipe)) {
+    painelTreinoConteudo.appendChild(
+      criarElemento("p", "vazio", "Os treinos da assessoria ficam na área dos alunos, com as orientações e a planilha do treinador.")
+    )
+    const ir = criarElemento("a", "botao botao-pequeno", "Ver treinos da assessoria")
+    ir.href = "assessoria.html?equipe=" + minhaEquipe.slug + "#area-alunos"
+    painelTreinoConteudo.appendChild(ir)
     return
   }
 
@@ -330,7 +343,7 @@ function criarCartaoDoProximoTreino(treino, minhaEquipe) {
 
   const acoes = criarElemento("div", "treino-acoes")
   const link = criarElemento("a", "botao-texto", "Abrir a página da equipe")
-  link.href = "equipe.html?equipe=" + minhaEquipe.slug + "#treinos"
+  link.href = enderecoDaEquipe(minhaEquipe) + "#treinos"
   acoes.appendChild(link)
   cartao.appendChild(acoes)
 
@@ -351,9 +364,10 @@ function mostrarAvisoNaHome() {
     return
   }
 
-  avisoHomeTitulo.textContent = "Aviso do líder da " + minhaEquipe.nome
+  avisoHomeTitulo.textContent =
+    (ehAssessoria(minhaEquipe) ? "Aviso do treinador da " : "Aviso do líder da ") + minhaEquipe.nome
   avisoHomeTexto.textContent = minhaEquipe.aviso
-  avisoHomeLink.href = "equipe.html?equipe=" + minhaEquipe.slug
+  avisoHomeLink.href = enderecoDaEquipe(minhaEquipe)
   avisoHome.hidden = false
 }
 
@@ -386,7 +400,14 @@ function desenharEquipes() {
 
     const selo = document.createElement("span")
     selo.className = "equipe-selo"
-    selo.textContent = "Sua equipe"
+    selo.textContent = ehAssessoria(equipe) ? "Sua assessoria" : "Sua equipe"
+
+    if (ehAssessoria(equipe)) {
+      const etiqueta = document.createElement("span")
+      etiqueta.className = "equipe-etiqueta"
+      etiqueta.textContent = "Assessoria"
+      tile.appendChild(etiqueta)
+    }
 
     const nome = document.createElement("span")
     nome.className = "equipe-nome"
@@ -420,6 +441,15 @@ async function abrirEquipe(tile) {
     return
   }
 
+  const escolhida = equipePorSlug(tile.dataset.slug)
+
+  // Assessoria não tem entrada direta: a pessoa abre a página e pede a entrada,
+  // e o treinador aprova.
+  if (ehAssessoria(escolhida)) {
+    window.location.href = enderecoDaEquipe(escolhida)
+    return
+  }
+
   // Quem ainda não tem equipe entra na equipe que clicou.
   // Quem já tem equipe só abre a página (para trocar, usa o botão
   // "Passar para esta equipe" dentro da página da equipe).
@@ -436,7 +466,7 @@ async function abrirEquipe(tile) {
     perfil.equipe = tile.dataset.equipe
   }
 
-  window.location.href = "equipe.html?equipe=" + tile.dataset.slug
+  window.location.href = enderecoDaEquipe(escolhida)
 }
 
 
