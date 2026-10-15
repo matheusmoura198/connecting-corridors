@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0A55DB">
+  <title>Assessoria | Runners Conecting</title>
+  <link rel="icon" href="img/logo.png" type="image/png">
+
+  <!-- Fontes (só visual). Se ficarem sem internet, o navegador usa uma fonte parecida. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <noscript>
+    <p class="aviso-noscript">Este site precisa do JavaScript ativado para funcionar.</p>
+  </noscript>
+
+  <!-- A página só aparece depois que o script confirma que você está logado -->
+  <div id="pagina" hidden>
+
+    <header class="topo">
+      <div class="topo-conteudo">
+        <a class="marca" href="index.html#inicio">
+          <img src="img/logo.png" alt="" width="36" height="36">
+          <span>Runners Conecting</span>
+        </a>
+        <button type="button" id="botao-sair" class="botao-sair">Sair</button>
+        <nav class="menu" aria-label="Seções da página">
+          <a href="index.html#inicio">Início</a>
+          <a href="index.html#equipes">Equipes</a>
+          <a href="#apresentacao">Apresentação</a>
+          <a id="link-area-alunos" href="#area-alunos" hidden>Treinos e publicações</a>
+          <a id="link-gestao" href="#gestao" hidden>Alunos</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- CAPA DA ASSESSORIA -->
+      <section class="equipe-topo">
+        <div class="container">
+          <div class="equipe-capa">
+            <img id="equipe-foto" src="img/camposrunning-image.jpeg" alt="imagem da equipe campos running">
+            <h1 id="equipe-titulo" class="equipe-capa-titulo"></h1>
+          </div>
+
+          <p id="equipe-situacao" class="equipe-situacao"></p>
+          <button type="button" id="botao-solicitar" class="botao" hidden>Solicitar entrada na assessoria</button>
+          <p id="msg-equipe" class="mensagem" role="alert"></p>
+
+          <!-- Aviso fixado pelo treinador (aparece só para os alunos, se houver aviso) -->
+          <div id="aviso-fixado" class="aviso-fixado" hidden>
+            <p class="aviso-fixado-titulo">Aviso do treinador</p>
+            <p id="aviso-fixado-texto" class="aviso-fixado-texto"></p>
+            <div class="aviso-fixado-rodape">
+              <span id="aviso-fixado-data" class="aviso-fixado-data"></span>
+              <span id="aviso-fixado-whatsapp"></span>
+            </div>
+          </div>
+
+          <!-- Só o treinador (e o admin) vê esta parte -->
+          <details id="area-aviso" class="area-lider area-aviso" hidden>
+            <summary>Escrever aviso para os alunos</summary>
+
+            <form id="form-aviso" class="formulario form-treino" novalidate>
+              <div class="campo">
+                <label for="aviso-campo">Aviso (aparece no topo desta página e na página inicial dos alunos)</label>
+                <textarea id="aviso-campo" rows="3" maxlength="500"></textarea>
+              </div>
+
+              <p id="msg-aviso" class="mensagem" role="alert"></p>
+
+              <div class="form-botoes">
+                <button type="submit" id="botao-publicar-aviso" class="botao">Publicar aviso</button>
+                <button type="button" id="botao-remover-aviso" class="botao-sair" hidden>Remover aviso</button>
+              </div>
+            </form>
+          </details>
+        </div>
+      </section>
+
+      <!-- APRESENTAÇÃO, SERVIÇOS E CONTATOS (todo mundo vê) -->
+      <section id="apresentacao" class="secao">
+        <div class="container">
+          <h2 class="titulo-secao">Sobre a assessoria</h2>
+          <p id="texto-apresentacao" class="texto-apresentacao"></p>
+
+          <div id="bloco-servicos" class="bloco-servicos" hidden>
+            <h3>Serviços</h3>
+            <ul id="lista-servicos" class="lista-servicos"></ul>
+          </div>
+
+          <div id="contatos" class="contatos"></div>
+
+          <!-- Só o treinador (e o admin) vê esta parte -->
+          <details id="area-apresentacao" class="area-lider area-aviso" hidden>
+            <summary>Editar apresentação, serviços e contatos</summary>
+
+            <form id="form-apresentacao" class="formulario form-treino" novalidate>
+              <div class="campo">
+                <label for="apresentacao-campo">Apresentação</label>
+                <textarea id="apresentacao-campo" rows="4" maxlength="800"></textarea>
+              </div>
+              <div class="campo">
+                <label for="servicos-campo">Serviços (um por linha)</label>
+                <textarea id="servicos-campo" rows="5" maxlength="1000"></textarea>
+              </div>
+              <div class="campo-dupla">
+                <div class="campo">
+                  <label for="whatsapp-campo">WhatsApp (com DDD)</label>
+                  <input id="whatsapp-campo" type="tel" maxlength="20" placeholder="(62) 98148-4988">
+                </div>
+                <div class="campo">
+                  <label for="instagram-campo">Instagram (usuário ou link)</label>
+                  <input id="instagram-campo" type="text" maxlength="100">
+                </div>
+              </div>
+
+              <p id="msg-apresentacao" class="mensagem" role="alert"></p>
+              <button type="submit" id="botao-salvar-apresentacao" class="botao">Salvar</button>
+            </form>
+          </details>
+        </div>
+      </section>
+
+      <!-- ÁREA DOS ALUNOS: treinos (orientações e planilha) e publicações do treinador -->
+      <section id="area-alunos" class="secao secao-clara" hidden>
+        <div class="container">
+          <h2 class="titulo-secao">Área dos alunos</h2>
+          <p class="texto-secao">Orientações, planilhas e novidades do treinador. Os alunos podem curtir e comentar.</p>
+
+          <div class="abas abas-duvidas abas-area" role="tablist" aria-label="Treinos ou publicações">
+            <button type="button" id="aba-treinos" class="aba" role="tab" aria-selected="true">Treinos</button>
+            <button type="button" id="aba-publicacoes" class="aba" role="tab" aria-selected="false">Publicações</button>
+          </div>
+
+          <div class="mural">
+            <p id="aviso-mural" class="aviso-equipe" hidden>Só o treinador publica aqui. Você pode curtir e comentar.</p>
+
+            <form id="form-post" class="formulario form-post" novalidate>
+              <div id="post-titulo-campo" class="campo" hidden>
+                <label for="post-titulo">Título do treino</label>
+                <input id="post-titulo" type="text" maxlength="100">
+              </div>
+
+              <div class="campo">
+                <label for="post-texto">Escreva uma mensagem</label>
+                <textarea id="post-texto" rows="4" maxlength="500"></textarea>
+              </div>
+
+              <div id="post-link-campo" class="campo" hidden>
+                <label for="post-link">Link da planilha (opcional)</label>
+                <input id="post-link" type="url" maxlength="500" placeholder="https://">
+              </div>
+
+              <div class="post-foto-linha">
+                <input id="post-foto" class="campo-arquivo" type="file" accept="image/*">
+                <label for="post-foto" class="botao-arquivo">Adicionar foto</label>
+
+                <div id="previa-foto" class="previa-foto" hidden>
+                  <img id="previa-imagem" alt="Prévia da foto escolhida">
+                  <button type="button" id="botao-remover-foto" class="botao-texto botao-texto-perigo">Remover foto</button>
+                </div>
+              </div>
+
+              <p id="msg-post" class="mensagem" role="alert"></p>
+              <button type="submit" id="botao-publicar" class="botao">Publicar</button>
+            </form>
+
+            <div id="lista-posts" class="lista-posts"></div>
+            <p id="sem-posts" class="vazio">Ainda não há postagens.</p>
+            <button type="button" id="botao-mais-posts" class="botao-sair" hidden>Ver postagens mais antigas</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ALUNOS E PEDIDOS DE ENTRADA (só o treinador vê) -->
+      <section id="gestao" class="secao" hidden>
+        <div class="container">
+          <h2 class="titulo-secao">Alunos e pedidos de entrada</h2>
+
+          <h3 class="subtitulo-gestao">Pedidos de entrada</h3>
+          <div id="lista-pedidos" class="lista-gestao"></div>
+          <p id="sem-pedidos" class="vazio">Nenhum pedido de entrada no momento.</p>
+
+          <h3 class="subtitulo-gestao">Alunos</h3>
+          <p id="total-alunos" class="texto-secao"></p>
+          <div id="lista-alunos" class="lista-gestao"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="rodape">
+      <div class="container">
+        <p>Runners Conecting. Equipes de corrida da região, organizadas. <a href="privacidade.html">Termos e privacidade</a></p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Biblioteca do Supabase (única biblioteca externa do site) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="comum.js"></script>
+  <script src="mural.js"></script>
+  <script src="aviso.js"></script>
+  <script src="assessoria.js"></script>
+</body>
+</html>
