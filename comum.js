@@ -15,25 +15,32 @@ let perfil = null
 
 
 // ---------- As equipes ----------
-// As equipes ficam na tabela "equipes" do Supabase (slug, nome e foto).
+// As equipes ficam na tabela "equipes" do Supabase (slug, nome, foto, tipo...).
 // Para criar uma equipe nova, basta adicionar uma linha lá.
 // O "slug" é o nome curto que vai no endereço da página
 // (equipe.html?equipe=vai-na-fe).
 let EQUIPES = []
 
 async function carregarEquipes() {
-  let resposta = await cliente
-    .from("equipes")
-    .select("slug, nome, foto, aviso, aviso_em")
-    .order("criado_em", { ascending: true })
+  // Tenta carregar todas as colunas. Se alguma ainda não existe no banco (o SQL
+  // de atualização ainda não foi rodado), tenta com menos colunas, para o site
+  // continuar funcionando durante a atualização.
+  const colunas = [
+    "slug, nome, foto, aviso, aviso_em, tipo, apresentacao, servicos, whatsapp, instagram",
+    "slug, nome, foto, aviso, aviso_em",
+    "slug, nome, foto"
+  ]
 
-  // Se as colunas do aviso ainda não existem no banco (o SQL do aviso ainda não
-  // foi rodado), carrega as equipes sem elas para o site continuar funcionando.
-  if (resposta.error) {
+  let resposta = null
+  for (const lista of colunas) {
     resposta = await cliente
       .from("equipes")
-      .select("slug, nome, foto")
+      .select(lista)
       .order("criado_em", { ascending: true })
+
+    if (!resposta.error) {
+      break
+    }
   }
 
   EQUIPES = resposta.error ? [] : resposta.data
@@ -43,6 +50,16 @@ function equipePorSlug(slug) {
   return EQUIPES.find(function (equipe) {
     return equipe.slug === slug
   })
+}
+
+// Equipes comuns abrem equipe.html. Assessorias abrem assessoria.html.
+function enderecoDaEquipe(equipe) {
+  const pagina = equipe.tipo === "assessoria" ? "assessoria.html" : "equipe.html"
+  return pagina + "?equipe=" + equipe.slug
+}
+
+function ehAssessoria(equipe) {
+  return !!equipe && equipe.tipo === "assessoria"
 }
 
 
